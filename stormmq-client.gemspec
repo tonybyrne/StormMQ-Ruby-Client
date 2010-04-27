@@ -7,7 +7,7 @@ Gem::Specification.new do |s|
   s.name = "stormmq-client"
   s.version = "0.0.1"
   s.authors = ["Tony Byrne"]
-  s.homepage = "http://www.byrnehq.com/"
+  s.homepage = "http://github.com/tonybyrne/StormMQ-Ruby-Client"
   s.summary = "A client for StormMQ's Cloud Messaging service"
   s.description = "#{s.summary}. Basic for now."
   s.cert_chain = nil
