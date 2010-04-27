@@ -11,10 +11,16 @@
 $:.unshift File.dirname(__FILE__) + '/../lib'
 require 'rubygems'
 require 'optparse'
-require 'stormmq-client'
+require 'stormmq-amqp'
 
 def required_options
-  [:user, :password, :company, :system, :environment]
+  {
+    :user        => 'ampqUser',
+    :password    => 'amqpPassword',
+    :company     => 'company',
+    :system      => 'system',
+    :environment => 'environment'
+  }
 end
 
 def main
@@ -22,9 +28,7 @@ def main
 
   EM.run do
 
-    connection = StormMQ.connect(
-      options
-    )
+    connection = StormMQ::AMQPClient.connect(options)
 
     # open a channel on the A MQP connection
     channel = MQ.new(connection)
@@ -75,11 +79,11 @@ def parse_command_line_options
        options[:port] = port
      end
 
-     opts.on( '-u', '--amqp_user USER', 'USER is your login at http://stormmq.com/' ) do |user|
+     opts.on( '-u', '--amqpUser USER', 'USER is your login at http://stormmq.com/' ) do |user|
        options[:user] = user
      end
 
-     opts.on( '-p', '--amqp_password PASSWORD', 'eg BNuWk1agaAUPTZ15sx44kHvNkTnJXsevqTjIo1M1iwFOeNaUqr3qPn75Dnk==' ) do |password|
+     opts.on( '-p', '--amqpPassword PASSWORD', 'eg BNuWk1agaAUPTZ15sx44kHvNkTnJXsevqTjIo1M1iwFOeNaUqr3qPn75Dnk==' ) do |password|
        options[:password] = password
      end
 
@@ -109,12 +113,15 @@ def parse_command_line_options
   end
 
   required_options = required_options()
-  required_options.each do |option|
+  missing_required_options = false
+  required_options.keys.each do |option|
     unless options.has_key? option
-      puts "#{option.to_s.upcase} is missing but is required!"
-      exit
+      $stderr.puts "--#{required_options[option]} is missing but is required!"
+      missing_required_options = true
     end
   end
+
+  exit if missing_required_options
 
   options
 
