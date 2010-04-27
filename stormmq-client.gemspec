@@ -4,15 +4,15 @@
 require "base64"
 
 Gem::Specification.new do |s|
-  s.name = "stormmq-client"
-  s.version = "0.0.1"
-  s.authors = ["Tony Byrne"]
-  s.homepage = "http://github.com/tonybyrne/StormMQ-Ruby-Client"
-  s.summary = "A client for StormMQ's Cloud Messaging service"
-  s.description = "#{s.summary}. Basic for now."
-  s.cert_chain = nil
-  s.email = Base64.decode64("c3Rvcm1tcUBieXJuZWhxLmNvbQ==\n")
-  s.has_rdoc = false
+  s.name        = "stormmq-client"
+  s.version     = "0.0.1"
+  s.authors     = ["Tony Byrne"]
+  s.homepage    = "http://github.com/tonybyrne/StormMQ-Ruby-Client"
+  s.summary     = "A client library for StormMQ's Cloud Messaging service"
+  s.description = "#{s.summary}. See http://www.stormmq.com/ for details of the service."
+  s.cert_chain  = nil
+  s.email       = Base64.decode64("c3Rvcm1tcUBieXJuZWhxLmNvbQ==\n")
+  s.has_rdoc    = false
 
   # files
   s.files = Dir['lib/**/*.rb'] + Dir['bin/*']
@@ -25,7 +25,7 @@ Gem::Specification.new do |s|
   s.require_paths = ["lib"]
 
   # Ruby version
-  s.required_ruby_version = ::Gem::Requirement.new("~> 1.8")
+  s.required_ruby_version = ::Gem::Requirement.new("~> 1.8.6")
 
   # dependencies
   # RubyGems has runtime dependencies (add_dependency) and
