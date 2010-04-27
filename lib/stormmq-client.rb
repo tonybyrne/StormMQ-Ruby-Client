@@ -22,7 +22,7 @@ module StormMQClient
             :version     => VERSION
           },
           'AMQPLAIN',
-          "\0#{@settings[:user]}\0#{@settings[:pass]}",
+          "\0#{@settings[:user]}\0#{@settings[:password]}",
           'en_US'
         )
 

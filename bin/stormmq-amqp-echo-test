@@ -19,15 +19,11 @@ end
 
 def main
   options = parse_command_line_options()
+
   EM.run do
 
     connection = StormMQ.connect(
-      :user        => options[:user],
-      :pass        => options[:password],
-      :company     => options[:company],
-      :system      => options[:system],
-      :environment => options[:environment],
-      :logging     => options[:trace]
+      options
     )
 
     # open a channel on the A MQP connection
@@ -71,6 +67,14 @@ def parse_command_line_options
        exit
      end
 
+     opts.on( '--host SERVER', 'use SERVER as AMQP host (default: amqp.stormmq.com)' ) do |host|
+       options[:host] = host
+     end
+
+     opts.on( '--port PORT', 'connect to server on port PORT (default: 443)' ) do |port|
+       options[:port] = port
+     end
+
      opts.on( '-u', '--amqp_user USER', 'USER is your login at http://stormmq.com/' ) do |user|
        options[:user] = user
      end
@@ -92,7 +96,7 @@ def parse_command_line_options
      end
 
      opts.on( '-t', '--trace', 'output the dialogue between client and server') do
-       options[:trace] = true
+       options[:logging] = true
      end
 
    end
