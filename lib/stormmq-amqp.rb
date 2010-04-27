@@ -3,6 +3,12 @@ require 'pp'
 
 module StormMQ
 
+  module Utils
+    def self.stormmq_credentials_string(user, password)
+      "\0#{user}\0#{password}"
+    end
+  end
+
   module AMQPClientImplementation
 
     VERSION = '0.0.1'
@@ -20,12 +26,12 @@ module StormMQ
           send Protocol::Connection::StartOk.new(
             {
               :platform    => 'Ruby/EventMachine',
-              :product     => 'AMQP',
-              :information => 'http://github.com/tmm1/amqp',
+              :product     => 'StormMQ AMQP',
+              :information => 'http://github.com/tonybyrne/StormMQ-Ruby-Client/',
               :version     => VERSION
             },
             'AMQPLAIN',
-            "\0#{@settings[:user]}\0#{@settings[:password]}",
+            Utils.stormmq_credentials_string(@settings[:user], @settings[:password]),
             'en_US'
           )
 
@@ -62,7 +68,7 @@ module StormMQ
       AMQP.client = AMQPClientImplementation
       AMQP.connect(
         {
-          :vhost   => self.vhost_from_stormmq_options(options),
+          :vhost   => self.vhost_from_options(options),
           :host    => 'amqp.stormmq.com',
           :port    => 443,
           :ssl     => true
@@ -70,7 +76,7 @@ module StormMQ
       )
     end
 
-    def self.vhost_from_stormmq_options(options)
+    def self.vhost_from_options(options)
       vhost = "/#{options[:company]}/#{options[:system]}/#{options[:environment]}"
       [:company, :system, :environment].each {|option| options.delete(option)}
       vhost
