@@ -22,10 +22,7 @@ end
 
 def main
   options = parse_command_line_options()
-  keys          = StormMQ::Utils.load_secret_keys
-  canonical_url = StormMQ::Utils.canonicalise_url(options[:url], options[:user])
-  signed_url    = StormMQ::Utils.sign_url(options[:method], canonical_url, keys[options[:user]])
-  puts signed_url
+  puts StormMQ::URLSigner.sign(options.delete(:url), options)
 end
 
 def parse_command_line_options
@@ -54,6 +51,10 @@ def parse_command_line_options
 
      opts.on( '--method METHOD', 'the HTTP method to use, e.g. GET' ) do |method|
        options[:method] = method.upcase
+     end
+
+     opts.on( '--compact', 'return a compact form of the URL' ) do
+       options[:compact] = true
      end
 
 
