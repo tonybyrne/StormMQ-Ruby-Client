@@ -29,6 +29,7 @@ Gem::Specification.new do |s|
   s.add_dependency             "amqp",        ">= 0.6.7"
   s.add_dependency             "rest-client", ">= 1.4.2"
   s.add_dependency             "ruby-hmac",   ">= 0.4.0"
+  s.add_dependency             "json",        ">= 1.4.2"
   s.add_development_dependency "rspec",       ">= 1.3.0"
 
 

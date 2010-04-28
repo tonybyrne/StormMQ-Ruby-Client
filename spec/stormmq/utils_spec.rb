@@ -11,7 +11,13 @@ describe StormMQ::Utils do
   describe "canonicalise_url" do
 
     it "should handle the simplest case" do
-      StormMQ::Utils.canonicalise_url('https://api.stormmq.com/').should == 'https://api.stormmq.com:443'
+      StormMQ::Utils.canonicalise_url('https://api.stormmq.com/', 'tonybyrne', 0).should == 'https://api.stormmq.com:443/?user=tonybyrne&version=0'
+    end
+
+    it "should handle a complex case" do
+      url   = 'https://api.stormmq.com/api/2009-01-01/%3D%25?empty=&%20novalue&foo=%2Fvalue'
+      c_url = 'https://api.stormmq.com:443/api/2009-01-01/%3D%25?%20novalue=&empty=&foo=%2Fvalue&user=raph&version=0'
+      StormMQ::Utils.canonicalise_url(url, 'raph', 0).should == c_url
     end
 
   end
@@ -58,5 +64,18 @@ describe StormMQ::Utils do
 
   end
 
+  describe "secret_keys_hash_from_json" do
+
+    it "should retrieve the secret key for a user from the json format key file" do
+      json = '{"tonybyrne":"my key"}'
+      StormMQ::Utils.secret_keys_hash_from_json(json).should == { 'tonybyrne' => 'my key' }
+    end
+
+    it "it should uri decode the key" do
+      json = '{"tonybyrne":"-_"}'
+      StormMQ::Utils.secret_keys_hash_from_json(json).should == { 'tonybyrne' => '+/' }
+    end
+
+  end
 
 end

@@ -1,0 +1,85 @@
+#!/usr/bin/env ruby
+#
+# Copyright (c) 2010 StormMQ Limited
+#
+# The contents of this file are subject to the Mozilla Public License
+# Version 1.1 (the "License"); you may not use this file except in
+# compliance with the License. You may obtain a copy of the License at
+# http://www.mozilla.org/MPL/
+#
+
+$:.unshift File.dirname(__FILE__) + '/../lib'
+require 'optparse'
+require 'stormmq'
+
+def required_options
+  {
+    :user        => 'user',
+    :url         => 'url',
+    :method      => 'method'
+  }
+end
+
+def main
+  options = parse_command_line_options()
+  keys    = StormMQ::Utils.load_secret_keys
+  canonical_url = StormMQ::Utils.canonicalise_url(options[:url], options[:user])
+  signed_url = StormMQ::Utils.sign_url(options[:method], canonical_url, keys[options[:user]])
+  puts signed_url
+end
+
+def parse_command_line_options
+
+  options = {}
+
+  optparse = OptionParser.new do|opts|
+     # Set a banner, displayed at the top
+     # of the help screen.
+     opts.banner = "Usage: #{$0} [options]"
+
+     # This displays the help screen, all programs are
+     # assumed to have this option.
+     opts.on( '-h', '--help', 'display this screen' ) do
+       puts opts
+       exit
+     end
+
+     opts.on( '--user USER', 'USER is your login at http://stormmq.com/' ) do |user|
+       options[:user] = user
+     end
+
+     opts.on( '--url URL', 'e.g. https://api.stormmq.com/api/2009-01-01/ Do not specify user, signature or version (of signature) GET parameters.  Must already be URI encoded as per RFC 3986' ) do |url|
+       options[:url] = url
+     end
+
+     opts.on( '--method METHOD', 'the HTTP method to use, e.g. GET' ) do |method|
+       options[:method] = method.upcase
+     end
+
+
+   end
+
+  begin
+    optparse.parse!
+  rescue OptionParser::ParseError => e
+    puts e
+    exit
+  end
+
+  required_options = required_options()
+  missing_required_options = false
+  required_options.keys.each do |option|
+    unless options.has_key? option
+      $stderr.puts "--#{required_options[option]} is missing but is required!"
+      missing_required_options = true
+    end
+  end
+
+  exit if missing_required_options
+
+  options
+
+end
+
+main
+__END__
