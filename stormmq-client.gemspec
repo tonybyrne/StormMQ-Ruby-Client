@@ -17,19 +17,19 @@ Gem::Specification.new do |s|
   # files
   s.files = Dir['lib/**/*.rb'] + Dir['bin/*']
   s.files << Dir['[A-Z]*'] + Dir['test/**/*']
-  s.files.reject! { |fn| fn.include? "CVS" }
 
   s.executables = Dir["bin/*"].map(&File.method(:basename))
 
-  # s.default_executable = "stormmq-amqp-echo-test"
   s.require_paths = ["lib"]
 
   # Ruby version
-  s.required_ruby_version = ::Gem::Requirement.new("~> 1.8.6")
+  # s.required_ruby_version = ::Gem::Requirement.new("~> 1.8.6")
 
   # dependencies
-  # RubyGems has runtime dependencies (add_dependency) and
-  # development dependencies (add_development_dependency)
-  s.add_dependency "amqp", ">= 0.6.7"
+  s.add_dependency             "amqp",        ">= 0.6.7"
+  s.add_dependency             "rest-client", ">= 1.4.2"
+  s.add_dependency             "ruby-hmac",   ">= 0.4.0"
+  s.add_development_dependency "rspec",       ">= 1.3.0"
+
 
 end
