@@ -5,7 +5,7 @@ require "base64"
 
 Gem::Specification.new do |s|
   s.name        = "stormmq-client"
-  s.version     = "0.0.1"
+  s.version     = "0.0.2"
   s.authors     = ["Tony Byrne"]
   s.homepage    = "http://github.com/tonybyrne/StormMQ-Ruby-Client"
   s.summary     = "A client library for StormMQ's Cloud Messaging service"

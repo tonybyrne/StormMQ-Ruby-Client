@@ -5,7 +5,7 @@ module StormMQ
 
   module AMQPClientImplementation
 
-    VERSION = '0.0.1'
+    VERSION = '0.0.2'
 
     def process_frame frame
       if mq = channels[frame.channel]
