@@ -42,7 +42,7 @@ module StormMQ
       hmac = HMAC::SHA256.new(Base64.decode64(base64key))
       hmac.update("#{method}#{url}")
       signature = Base64.encode64(hmac.digest).tr("+/","-_").chomp
-      url + '&signature=' + URI.encode(signature)
+      url + '&signature=' + uri_escape(signature)
     end
 
     def self.canonicalise_url(url, user, version=0)

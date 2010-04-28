@@ -22,9 +22,9 @@ end
 
 def main
   options = parse_command_line_options()
-  keys    = StormMQ::Utils.load_secret_keys
+  keys          = StormMQ::Utils.load_secret_keys
   canonical_url = StormMQ::Utils.canonicalise_url(options[:url], options[:user])
-  signed_url = StormMQ::Utils.sign_url(options[:method], canonical_url, keys[options[:user]])
+  signed_url    = StormMQ::Utils.sign_url(options[:method], canonical_url, keys[options[:user]])
   puts signed_url
 end
 
