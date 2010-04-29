@@ -1,10 +1,12 @@
 #!/usr/bin/env ruby
-#
+# encoding: utf-8
+#--
 # Copyright (c) 2010, Tony Byrne & StormMQ Ltd.
 # All rights reserved.
 #
 # Please refer to the LICENSE file that accompanies this source
 # for terms of use and redistribution.
+#++
 
 $:.unshift File.dirname(__FILE__) + '/../lib'
 require 'rubygems'

@@ -1,8 +1,10 @@
+#--
 # Copyright (c) 2010, Tony Byrne & StormMQ Ltd.
 # All rights reserved.
 #
 # Please refer to the LICENSE file that accompanies this source
 # for terms of use and redistribution.
+#++
 
 require 'rubygems'
 require 'singleton'
@@ -20,7 +22,7 @@ module StormMQ
 
     # Returns the base64 encoded secret key for the given user name from the secret keys file.
     def key_for(user)
-      keys[user]
+      keys[user] || (raise StormMQ::Error::SecretKeyNotFoundError, "a secret key for user '#{user}' could not be found in the secret key file.", caller)
     end
 
     # Returns an <tt>Array</tt> of user names of users who have keys in the secret keys file.

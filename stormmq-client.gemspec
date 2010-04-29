@@ -1,12 +1,12 @@
 #!/usr/bin/env gem build
 # encoding: utf-8
-#
+#--
 # Copyright (c) 2010, Tony Byrne & StormMQ Ltd.
 # All rights reserved.
 #
 # Please refer to the LICENSE file that accompanies this source
 # for terms of use and redistribution.
-
+#++
 require "base64"
 
 Gem::Specification.new do |s|
