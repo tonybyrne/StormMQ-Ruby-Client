@@ -1,131 +1,115 @@
 #!/usr/bin/env ruby
 #
-# Copyright (c) 2010 StormMQ Limited
+# Copyright (c) 2010, Tony Byrne & StormMQ Ltd.
+# All rights reserved.
 #
-# The contents of this file are subject to the Mozilla Public License
-# Version 1.1 (the "License"); you may not use this file except in
-# compliance with the License. You may obtain a copy of the License at
-# http://www.mozilla.org/MPL/
-#
+# Please refer to the LICENSE file that accompanies this source
+# for terms of use and redistribution.
 
 $:.unshift File.dirname(__FILE__) + '/../lib'
-require 'optparse'
+require 'rubygems'
+require 'commandline'
+require 'commandline/optionparser'
 require 'stormmq'
 
-def required_options
-  {
-    :user        => 'ampqUser',
-    :password    => 'amqpPassword',
-    :company     => 'company',
-    :system      => 'system',
-    :environment => 'environment'
-  }
-end
+class StormMQAMQPEchoTest < CommandLine::Application
 
-def main
-  options = parse_command_line_options()
+  def initialize
+    author    "Tony Byrne"
+    copyright "Tony Byrne, 2010"
+    synopsis  "--amqpUser USER --amqpPassword PASSWORD --company COMPANY --system SYSTEM --environment ENVIRONMENT [--host HOST] [--port PORT]"
+    short_description "Verifies the ability to interact with StormMQ's message cloud service"
+    long_description  ""
+    options :help, :debug
 
-  EM.run do
+    option  :names           => %w(--host),
+            :opt_description => "server to connect to - defaults to 'amqp.stormmq.com'",
+            :arity           => [1,1],
+            :opt_found       => get_args,
+            :opt_not_found   => 'amqp.stormmq.com'
 
-    connection = StormMQ::AMQPClient.connect(options)
+    option  :names           => %w(--port),
+            :opt_description => "SSL port on server to connect to - defaults to '443'",
+            :arity           => [1,1],
+            :opt_found       => get_args,
+            :opt_not_found   => '443'
 
-    # open a channel on the A MQP connection
-    channel = MQ.new(connection)
+    option  :names           => %w(--amqpUser -u),
+            :opt_description => "a valid user name, i.e. the login you use at http://stormmq.com/",
+            :arity           => [1,1],
+            :opt_found       => get_args,
+            :opt_not_found   => CommandLine::OptionParser::OPT_NOT_FOUND_BUT_REQUIRED
 
-    # declare a queue on the channel
-    queue = MQ::Queue.new(channel, 'queue name')
+    option  :names           => %w(--amqpPassword -p),
+            :opt_description => "Base64 encoded password, e.g. 'BNuWk1agaAUPTZ15sx44kHvNkTnJXsevqTjIo1M1iwFOeNaUqr3qPn75Dnk=='",
+            :arity           => [1,1],
+            :opt_found       => get_args,
+            :opt_not_found   => CommandLine::OptionParser::OPT_NOT_FOUND_BUT_REQUIRED
 
-    # create a fanout exchange
-    exchange = MQ::Exchange.new(channel, :fanout, 'all queues')
+    option  :names           => %w(--company -c),
+            :opt_description => "your company identifier, usually the same as --amqpUser",
+            :arity           => [1,1],
+            :opt_found       => get_args,
+            :opt_not_found   => CommandLine::OptionParser::OPT_NOT_FOUND_BUT_REQUIRED
 
-    # bind the queue to the exchange
-    queue.bind(exchange)
+    option  :names           => %w(--system -s),
+            :opt_description => "your system, usually the same as --amqpUser",
+            :arity           => [1,1],
+            :opt_found       => get_args,
+            :opt_not_found   => CommandLine::OptionParser::OPT_NOT_FOUND_BUT_REQUIRED
 
-    # publish a message to the exchange
-    exchange.publish('hello world')
+    option  :names           => %w(--environment -e),
+            :opt_description => "the environment to use, e.g 'production', 'development', or 'testing'",
+            :arity           => [1,1],
+            :opt_found       => get_args,
+            :opt_not_found   => CommandLine::OptionParser::OPT_NOT_FOUND_BUT_REQUIRED
 
-    # subscribe to messages in the queue
-    queue.subscribe do |headers, msg|
-      puts msg == 'hello world' ? 'Succeeded' : 'Failed'
-      connection.close{ EM.stop_event_loop }
+  end
+
+  def main
+
+    EM.run do
+
+      puts "creating connection"
+      connection = StormMQ::AMQPClient.connect(
+        :user        => opt.amqpUser,
+        :password    => opt.amqpPassword,
+        :company     => opt.company,
+        :system      => opt.system,
+        :environment => opt.environment,
+        :host        => opt.host,
+        :port        => opt.port,
+        :logging     => opt['--debug']
+      )
+
+      puts "opening a channel on the A MQP connection"
+      channel = MQ.new(connection)
+
+      puts "declaring a queue on the channel"
+      queue = MQ::Queue.new(channel, 'test queue')
+
+      puts "creating a test exchange"
+      exchange = MQ::Exchange.new(channel, :direct, 'test exchange')
+
+      puts "binding the queue the the exchange"
+      queue.bind(exchange)
+
+      puts "publishing test message to the exchange"
+      exchange.publish('hello world')
+
+      puts "subsribing to the queue"
+      queue.subscribe do |headers, msg|
+        puts "recevied message from the queue:"
+        pp headers
+        puts msg
+        puts msg == 'hello world' ? 'Succeeded' : 'Failed'
+        connection.close{ EM.stop_event_loop }
+      end
+
     end
 
   end
 
 end
-
-def parse_command_line_options
-
-  options = {}
-
-  optparse = OptionParser.new do|opts|
-     # Set a banner, displayed at the top
-     # of the help screen.
-     opts.banner = "Usage: #{$0} [options]"
-
-     # This displays the help screen, all programs are
-     # assumed to have this option.
-     opts.on( '-h', '--help', 'display this screen' ) do
-       puts opts
-       exit
-     end
-
-     opts.on( '--host SERVER', 'use SERVER as AMQP host (default: amqp.stormmq.com)' ) do |host|
-       options[:host] = host
-     end
-
-     opts.on( '--port PORT', 'connect to server on port PORT (default: 443)' ) do |port|
-       options[:port] = port
-     end
-
-     opts.on( '-u', '--amqpUser USER', 'USER is your login at http://stormmq.com/' ) do |user|
-       options[:user] = user
-     end
-
-     opts.on( '-p', '--amqpPassword PASSWORD', 'eg BNuWk1agaAUPTZ15sx44kHvNkTnJXsevqTjIo1M1iwFOeNaUqr3qPn75Dnk==' ) do |password|
-       options[:password] = password
-     end
-
-     opts.on( '-c', '--company COMPANY', 'your company, usually the same as your user name' ) do |company|
-       options[:company] = company
-     end
-
-     opts.on( '-e', '--environment ENVIRONMENT', 'development, testing, production for the system we initially created') do |environment|
-       options[:environment] = environment
-     end
-
-     opts.on( '-s', '--system SYSTEM', 'your system, the same as your user name for the system we initially created') do |system|
-       options[:system] = system
-     end
-
-     opts.on( '-t', '--trace', 'output the dialogue between client and server') do
-       options[:logging] = true
-     end
-
-   end
-
-  begin
-    optparse.parse!
-  rescue OptionParser::ParseError => e
-    puts e
-    exit
-  end
-
-  required_options = required_options()
-  missing_required_options = false
-  required_options.keys.each do |option|
-    unless options.has_key? option
-      $stderr.puts "--#{required_options[option]} is missing but is required!"
-      missing_required_options = true
-    end
-  end
-
-  exit if missing_required_options
-
-  options
-
-end
-
-main
 
 __END__

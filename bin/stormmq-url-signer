@@ -1,86 +1,51 @@
 #!/usr/bin/env ruby
 #
-# Copyright (c) 2010 StormMQ Limited
+# Copyright (c) 2010, Tony Byrne & StormMQ Ltd.
+# All rights reserved.
 #
-# The contents of this file are subject to the Mozilla Public License
-# Version 1.1 (the "License"); you may not use this file except in
-# compliance with the License. You may obtain a copy of the License at
-# http://www.mozilla.org/MPL/
-#
+# Please refer to the LICENSE file that accompanies this source
+# for terms of use and redistribution.
+
 
 $:.unshift File.dirname(__FILE__) + '/../lib'
-require 'optparse'
+require 'rubygems'
+require 'commandline'
+require 'commandline/optionparser'
 require 'stormmq'
 
-def required_options
-  {
-    :user        => 'user',
-    :url         => 'url',
-    :method      => 'method'
-  }
-end
+class StormMQURLSigner < CommandLine::Application
 
-def main
-  options = parse_command_line_options()
-  puts StormMQ::URLSigner.sign(options.delete(:url), options)
-end
+  def initialize
+    author    "Tony Byrne"
+    copyright "Tony Byrne, 2010"
+    synopsis  "--user USER [--method METHOD] --url URL"
+    short_description "Signs a URL for use with StormMQ's RESTful API"
+    long_description  ""
+    options :help
 
-def parse_command_line_options
+    option  :names           => %w(--user -u),
+            :opt_description => "a valid StormMQ user name",
+            :arity           => [1,1],
+            :opt_found       => get_args,
+            :opt_not_found   => CommandLine::OptionParser::OPT_NOT_FOUND_BUT_REQUIRED
 
-  options = {}
+    option  :names           => %w(--method -m),
+            :opt_description => "the HTTP method to use - defaults to 'GET'",
+            :arity           => [0,1],
+            :opt_found       => get_args,
+            :opt_not_found   => 'GET'
 
-  optparse = OptionParser.new do|opts|
-     # Set a banner, displayed at the top
-     # of the help screen.
-     opts.banner = "Usage: #{$0} [options]"
-
-     # This displays the help screen, all programs are
-     # assumed to have this option.
-     opts.on( '-h', '--help', 'display this screen' ) do
-       puts opts
-       exit
-     end
-
-     opts.on( '--user USER', 'USER is your login at http://stormmq.com/' ) do |user|
-       options[:user] = user
-     end
-
-     opts.on( '--url URL', 'e.g. https://api.stormmq.com/api/2009-01-01/ Do not specify user, signature or version (of signature) GET parameters.  Must already be URI encoded as per RFC 3986' ) do |url|
-       options[:url] = url
-     end
-
-     opts.on( '--method METHOD', 'the HTTP method to use, e.g. GET' ) do |method|
-       options[:method] = method.upcase
-     end
-
-     opts.on( '--compact', 'return a compact form of the URL' ) do
-       options[:compact] = true
-     end
-
-
-   end
-
-  begin
-    optparse.parse!
-  rescue OptionParser::ParseError => e
-    puts e
-    exit
+    option  :names           => %w(--url -a),
+            :opt_description => "the URL to be signed",
+            :arity           => [1,1],
+            :opt_found       => get_args,
+            :opt_not_found   => CommandLine::OptionParser::OPT_NOT_FOUND_BUT_REQUIRED
   end
 
-  required_options = required_options()
-  missing_required_options = false
-  required_options.keys.each do |option|
-    unless options.has_key? option
-      $stderr.puts "--#{required_options[option]} is missing but is required!"
-      missing_required_options = true
-    end
+  def main
+    puts StormMQ::URLSigner.sign(opt.url, :method => opt['--method'], :user => opt.user)
   end
-
-  exit if missing_required_options
-
-  options
 
 end
 
-main
 __END__

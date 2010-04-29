@@ -1,5 +1,11 @@
 #!/usr/bin/env gem build
 # encoding: utf-8
+#
+# Copyright (c) 2010, Tony Byrne & StormMQ Ltd.
+# All rights reserved.
+#
+# Please refer to the LICENSE file that accompanies this source
+# for terms of use and redistribution.
 
 require "base64"
 
@@ -15,8 +21,9 @@ Gem::Specification.new do |s|
   s.has_rdoc    = false
 
   # files
-  s.files = Dir['lib/**/*.rb'] + Dir['bin/*']
-  s.files << Dir['[A-Z]*'] + Dir['test/**/*']
+  s.files = Dir['lib/**/*.rb'] + Dir['bin/*'] + Dir['spec/**/*'] + Dir['[A-Z]*']
+
+  puts s.files.to_yaml
 
   s.executables = Dir["bin/*"].map(&File.method(:basename))
 
@@ -30,7 +37,11 @@ Gem::Specification.new do |s|
   s.add_dependency             "rest-client", ">= 1.4.2"
   s.add_dependency             "ruby-hmac",   ">= 0.4.0"
   s.add_dependency             "json",        ">= 1.4.2"
+  s.add_dependency             "commandline", ">= 0.7.10"
   s.add_development_dependency "rspec",       ">= 1.3.0"
+  s.add_development_dependency "rake",        ">= 0.8.7"
+  s.add_development_dependency "rcov",        ">= 0.9.7.1"
+
 
 
 end

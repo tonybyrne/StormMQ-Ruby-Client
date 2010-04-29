@@ -1,3 +1,9 @@
+# Copyright (c) 2010, Tony Byrne & StormMQ Ltd.
+# All rights reserved.
+#
+# Please refer to the LICENSE file that accompanies this source
+# for terms of use and redistribution.
+
 require File.dirname(__FILE__) + '/../../lib/stormmq/url'
 
 describe StormMQ::URL do
@@ -13,25 +19,25 @@ describe StormMQ::URL do
   describe "canonicalise" do
 
     it "adds explicit port for HTTP" do
-      StormMQ::URL.new('http://api.stormmq.com/').canonicalise.to_s.should == 'http://api.stormmq.com:80/'
+      StormMQ::URL.new('http://api.stormmq.com/').canonicalise('test').to_s.should == 'http://api.stormmq.com:80/?user=test&version=0'
     end
 
     it "adds explicit port for HTTPS" do
-      StormMQ::URL.new('https://api.stormmq.com/').canonicalise.to_s.should == 'https://api.stormmq.com:443/'
+      StormMQ::URL.new('https://api.stormmq.com/').canonicalise('test').to_s.should == 'https://api.stormmq.com:443/?user=test&version=0'
     end
 
     it "sorts query string params by param name" do
-      StormMQ::URL.new('https://api.stormmq.com/?z=3&x=1&y=2').canonicalise.to_s.should == 'https://api.stormmq.com:443/?x=1&y=2&z=3'
+      StormMQ::URL.new('https://api.stormmq.com/?z=3&x=1&y=2').canonicalise('test').to_s.should == 'https://api.stormmq.com:443/?user=test&version=0&x=1&y=2&z=3'
     end
 
     it "sorts query string params with multiple values by value" do
-      StormMQ::URL.new('https://api.stormmq.com/?z=3&x=1&y=2&z=1').canonicalise.to_s.should == 'https://api.stormmq.com:443/?x=1&y=2&z=1&z=3'
+      StormMQ::URL.new('https://api.stormmq.com/?z=3&x=1&y=2&z=1').canonicalise('test').to_s.should == 'https://api.stormmq.com:443/?user=test&version=0&x=1&y=2&z=1&z=3'
     end
 
     it "should canonicalise complex example from http://stormmq.com/rest-apis/for-security-reasons (without user and version params)" do
       url = 'https://api.stormmq.com/api/2009-01-01/%3D%25?empty=&%20novalue&foo=%2Fvalue'
-      expected = 'https://api.stormmq.com:443/api/2009-01-01/%3D%25?%20novalue=&empty=&foo=%2Fvalue'
-      StormMQ::URL.new(url).canonicalise.to_s.should == expected
+      expected = 'https://api.stormmq.com:443/api/2009-01-01/%3D%25?%20novalue=&empty=&foo=%2Fvalue&user=raph&version=0'
+      StormMQ::URL.new(url).canonicalise('raph').to_s.should == expected
     end
 
   end

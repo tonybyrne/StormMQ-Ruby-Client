@@ -1,3 +1,10 @@
+# Copyright (c) 2010, Tony Byrne & StormMQ Ltd.
+# All rights reserved.
+#
+# Please refer to the LICENSE file that accompanies this source
+# for terms of use and redistribution.
+
+require 'rubygems'
 require 'uri'
 require 'cgi'
 require 'hmac'
@@ -38,10 +45,10 @@ module StormMQ
         add_query_params(:user => [user], :version => [version.to_s])
     end
 
-    def canonicalise
-      components = to_h
+    def canonicalise(user, version=0)
+      components         = self.add_user_and_version_query_params(user, version).to_h
       components[:query] = StormMQ::URL.canonicalise_query_string(components[:query]) unless components[:query].nil?
-      canonical = { :port => StormMQ::URL.default_port_for_scheme(components[:scheme]) }.merge(components)
+      canonical          = { :port => StormMQ::URL.default_port_for_scheme(components[:scheme]) }.merge(components)
       self.class.new(canonical)
     end
 
