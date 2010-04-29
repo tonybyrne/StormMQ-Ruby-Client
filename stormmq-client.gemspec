@@ -41,6 +41,7 @@ Gem::Specification.new do |s|
   s.add_development_dependency "rspec",       ">= 1.3.0"
   s.add_development_dependency "rake",        ">= 0.8.7"
   s.add_development_dependency "rcov",        ">= 0.9.7.1"
+  s.add_development_dependency "rdoc",        ">= 2.5.8"
 
 
 
