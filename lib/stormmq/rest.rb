@@ -23,23 +23,23 @@ module StormMQ
     attr_accessor :user
     attr_accessor :url_options
 
-    def initialize(options={})
-      @user        = options.delete(:user)       || ENV['STORMMQ_USER'] || (raise StormMQ::Error::UserNotProvidedError, "could not determine the user.")
-      @api         = options.delete(:api)        || API_PATH
-      @key         = options.delete(:secret_key) || StormMQ::SecretKeys.instance.key_for(@user)
+    def initialize(user, secret_key, options={})
+      @user        = user
+      @secret_key  = secret_key
+      @api_path    = options.delete(:api)  || API_PATH
       @url_options = options
     end
 
     def companies
-      get(build_signed_resource_url(COMPANIES_PATH))
+      get(build_signed_resource_url(COMPANIES_PATH, 'GET'))
     end
 
     def clusters(company)
-      get(build_signed_resource_url(CLUSTERS_PATH + '/' + StormMQ::URL.uri_escape(company)))
+      get(build_signed_resource_url(CLUSTERS_PATH + '/' + StormMQ::URL.escape(company), 'GET'))
     end
 
     def apis
-      get(build_signed_resource_url(LIST_APIS_PATH))
+      get(build_signed_resource_url(LIST_APIS_PATH, 'GET'))
     end
 
     private
@@ -48,14 +48,14 @@ module StormMQ
       JSON.parse(RestClient.get(signed_url.to_s, {:accept => '*/*'}).to_s)
     end
 
-    def build_signed_resource_url(path='/')
+    def build_signed_resource_url(resource_path='/', method='GET')
       StormMQ::URL.new(
         {
           :host   => API_HOST,
           :scheme => 'https',
-          :path   => @api + path
+          :path   => @api_path + resource_path
         }.merge(@url_options)
-      ).canonicalise(@user).sign(@key)
+      ).canonicalise_and_sign(@user, @secret_key, method)
     end
 
   end

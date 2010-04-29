@@ -21,11 +21,7 @@ class StormMQ::Application::URLSigner < StormMQ::Application
     long_description  ""
     options :help
 
-    option  :names           => %w(--user -u),
-            :opt_description => "a valid StormMQ user name",
-            :arity           => [1,1],
-            :opt_found       => get_args,
-            :opt_not_found   => CommandLine::OptionParser::OPT_NOT_FOUND_BUT_REQUIRED
+    option_user
 
     option  :names           => %w(--method -m),
             :opt_description => "the HTTP method to use - defaults to 'GET'",
@@ -41,7 +37,12 @@ class StormMQ::Application::URLSigner < StormMQ::Application
   end
 
   def main
-    puts StormMQ::URLSigner.sign(opt.url, :method => opt['--method'], :user => opt.user)
+    raise_error_if_user_not_provided
+    puts self.url.canonicalise_and_sign(opt.user, self.secret_key, opt['--method'])
+  end
+
+  def url
+    StormMQ::URL.new(opt.url)
   end
 
 end

@@ -22,6 +22,8 @@ module StormMQ
 
     # Returns the base64 encoded secret key for the given user name from the secret keys file.
     def key_for(user)
+      raise StormMQ::Error::UserNotProvidedError, "user cannot be nil."   if user.nil?
+      raise StormMQ::Error::UserNotProvidedError, "user cannot be empty." if user.empty?
       keys[user] || (raise StormMQ::Error::SecretKeyNotFoundError, "a secret key for user '#{user}' could not be found in the secret key file.", caller)
     end
 
@@ -34,7 +36,7 @@ module StormMQ
 
     # Return a hash of keys stored in the secret keys file.
     def keys
-      @keys_cache ||= load_secret_keys
+      @secret_keys_cache ||= load_secret_keys
     end
 
     # Load the keys from the secret keys file <tt>keyfile</tt>.  Walks the locations specified in
@@ -50,6 +52,10 @@ module StormMQ
       raise StormMQ::Error::LoadSecretKeysError,
           "Could not read the secret keys file from any of [#{full_paths.join ', '}]. Please ensure that a valid keyfile exists in one of these locations and that it is readable.",
           caller
+    end
+
+    def self.key_for(*args)
+      self.instance.key_for(*args)
     end
 
     # Create a hash of the keys contained in json fragment.

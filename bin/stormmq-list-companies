@@ -20,15 +20,11 @@ class StormMQ::Application::ListCompanies < StormMQ::Application
     short_description "Lists the companies available to you (typically one)"
     long_description  ""
     options :help
-
-    option :names           => %w(--user -u),
-           :opt_description => "a valid user name, i.e. the login you use at http://stormmq.com/",
-           :arity           => [1,1],
-           :opt_found       => get_args
+    option_user
   end
 
   def main
-    StormMQ::Rest.new(:user => @user).companies.each {|c| puts c }
+    self.rest_client.companies.each {|c| puts c}
   end
 
 end

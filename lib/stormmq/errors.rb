@@ -10,13 +10,19 @@ module StormMQ
 
   module Error
 
-    class LoadSecretKeysError < StandardError
+    class Base < StandardError
     end
 
-    class SecretKeyNotFoundError < StandardError
+    class LoadSecretKeysError < StormMQ::Error::Base
     end
 
-    class UserNotProvidedError < StandardError
+    class SecretKeyNotFoundError < StormMQ::Error::Base
+    end
+
+    class UserNotProvidedError < StormMQ::Error::Base
+    end
+
+    class InvalidURLError < StormMQ::Error::Base
     end
 
   end

@@ -20,15 +20,11 @@ class StormMQ::Application::ListAPIs < StormMQ::Application
     short_description "Describes all current APIs available in YAML format"
     long_description  ""
     options :help
-
-    option :names           => %w(--user -u),
-           :opt_description => "a valid user name, i.e. the login you use at http://stormmq.com/",
-           :arity           => [1,1],
-           :opt_found       => get_args
+    option_user
   end
 
   def main
-    puts StormMQ::Rest.new(:user => @user).apis.to_yaml
+    puts self.rest_client.apis.to_yaml
   end
 
 end

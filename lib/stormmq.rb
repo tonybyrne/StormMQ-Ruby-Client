@@ -7,12 +7,10 @@
 #++
 
 $:.unshift File.dirname(__FILE__)
-require 'stormmq/application'
 require 'stormmq/utils'
+require 'stormmq/application'
 require 'stormmq/amqp'
 require 'stormmq/rest'
 require 'stormmq/errors'
-require 'stormmq/url_signer'
 require 'stormmq/secret_keys'
 require 'stormmq/url'
-require 'stormmq/url_signer'

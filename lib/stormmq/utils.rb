@@ -13,3 +13,15 @@ module StormMQ
     end
   end
 end
+
+class String
+  def blank?
+    self.gsub(/\s+/,'') == ""
+  end
+end
+
+class NilClass
+  def blank?
+    true
+  end
+end
