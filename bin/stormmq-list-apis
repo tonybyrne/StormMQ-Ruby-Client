@@ -13,11 +13,11 @@ require 'rubygems'
 require 'commandline/optionparser'
 require 'stormmq'
 
-class StormMQ::Application::ListCompanies < StormMQ::Application
+class StormMQ::Application::ListAPIs < StormMQ::Application
 
   def initialize
     synopsis  "[--user USER]"
-    short_description "Lists the companies available to you (typically one)"
+    short_description "Describes all current APIs available in YAML format"
     long_description  ""
     options :help
 
@@ -28,7 +28,7 @@ class StormMQ::Application::ListCompanies < StormMQ::Application
   end
 
   def main
-    StormMQ::Rest.new(:user => @user).companies.each {|c| puts c }
+    puts StormMQ::Rest.new(:user => @user).apis.to_yaml
   end
 
 end

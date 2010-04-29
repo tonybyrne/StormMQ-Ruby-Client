@@ -16,7 +16,7 @@ require 'stormmq'
 class StormMQ::Application::ListCompanies < StormMQ::Application
 
   def initialize
-    synopsis  "[--user USER]"
+    synopsis  "[--user USER] --company COMPANY"
     short_description "Lists the companies available to you (typically one)"
     long_description  ""
     options :help
@@ -25,10 +25,16 @@ class StormMQ::Application::ListCompanies < StormMQ::Application
            :opt_description => "a valid user name, i.e. the login you use at http://stormmq.com/",
            :arity           => [1,1],
            :opt_found       => get_args
+
+    option :names           => %w(--company -c),
+          :opt_description => "your company identifier, usually the same as --user",
+          :arity           => [1,1],
+          :opt_found       => get_args,
+          :opt_not_found   => CommandLine::OptionParser::OPT_NOT_FOUND_BUT_REQUIRED
   end
 
   def main
-    StormMQ::Rest.new(:user => @user).companies.each {|c| puts c }
+    StormMQ::Rest.new(:user => @user).clusters(opt.company).each {|c| puts c }
   end
 
 end

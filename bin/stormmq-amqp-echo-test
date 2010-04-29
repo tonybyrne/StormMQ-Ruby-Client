@@ -10,15 +10,12 @@
 
 $:.unshift File.dirname(__FILE__) + '/../lib'
 require 'rubygems'
-require 'commandline'
 require 'commandline/optionparser'
 require 'stormmq'
 
-class StormMQAMQPEchoTest < CommandLine::Application
+class StormMQ::Application::AMQPEchoTest < StormMQ::Application
 
   def initialize
-    author    "Tony Byrne"
-    copyright "Tony Byrne, 2010"
     synopsis  "--amqpUser USER --amqpPassword PASSWORD --company COMPANY --system SYSTEM --environment ENVIRONMENT [--host HOST] [--port PORT]"
     short_description "Verifies the ability to interact with StormMQ's message cloud service"
     long_description  ""

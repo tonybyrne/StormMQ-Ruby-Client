@@ -7,6 +7,7 @@
 #++
 
 $:.unshift File.dirname(__FILE__)
+require 'stormmq/application'
 require 'stormmq/utils'
 require 'stormmq/amqp'
 require 'stormmq/rest'

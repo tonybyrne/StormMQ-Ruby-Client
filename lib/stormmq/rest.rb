@@ -12,8 +12,11 @@ require "rest_client"
 
 module StormMQ
 
+  API_HOST       = "api.stormmq.com"
   API_PATH       = "/api/2009-01-01"
   COMPANIES_PATH = '/companies/'
+  CLUSTERS_PATH  = '/clusters'
+  LIST_APIS_PATH = '/'
 
   class Rest
 
@@ -31,6 +34,14 @@ module StormMQ
       get(build_signed_resource_url(COMPANIES_PATH))
     end
 
+    def clusters(company)
+      get(build_signed_resource_url(CLUSTERS_PATH + '/' + StormMQ::URL.uri_escape(company)))
+    end
+
+    def apis
+      get(build_signed_resource_url(LIST_APIS_PATH))
+    end
+
     private
 
     def get(signed_url)
@@ -40,7 +51,7 @@ module StormMQ
     def build_signed_resource_url(path='/')
       StormMQ::URL.new(
         {
-          :host   => 'api.stormmq.com',
+          :host   => API_HOST,
           :scheme => 'https',
           :path   => @api + path
         }.merge(@url_options)
