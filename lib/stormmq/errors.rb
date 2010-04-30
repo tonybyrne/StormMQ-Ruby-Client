@@ -19,6 +19,9 @@ module StormMQ
     class SecretKeyNotFoundError < StormMQ::Error::Base
     end
 
+    class SecretKeyNotProvidedError < StormMQ::Error::Base
+    end
+
     class UserNotProvidedError < StormMQ::Error::Base
     end
 

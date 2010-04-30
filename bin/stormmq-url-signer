@@ -9,8 +9,14 @@
 #++
 
 $:.unshift File.dirname(__FILE__) + '/../lib'
-require 'rubygems'
-require 'commandline/optionparser'
+
+begin
+  require 'commandline/optionparser'
+rescue LoadError
+  require 'rubygems'
+  retry
+end
+
 require 'stormmq'
 
 class StormMQ::Application::URLSigner < StormMQ::Application
@@ -20,7 +26,6 @@ class StormMQ::Application::URLSigner < StormMQ::Application
     short_description "Signs a URL for use with StormMQ's RESTful API"
     long_description  ""
     options :help
-
     option_user
 
     option  :names           => %w(--method -m),
@@ -37,7 +42,6 @@ class StormMQ::Application::URLSigner < StormMQ::Application
   end
 
   def main
-    raise_error_if_user_not_provided
     puts self.url.canonicalise_and_sign(opt.user, self.secret_key, opt['--method'])
   end
 
@@ -47,4 +51,4 @@ class StormMQ::Application::URLSigner < StormMQ::Application
 
 end
 
-__END__
+StormMQ::Application::URLSigner.run

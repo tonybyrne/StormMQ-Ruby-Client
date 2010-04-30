@@ -6,9 +6,14 @@
 # for terms of use and redistribution.
 #++
 
-require 'rubygems'
-require 'rake'
-require 'spec/rake/spectask'
+begin
+  require 'rake'
+  require 'spec/rake/spectask'
+rescue
+  require 'rubygems'
+  retry
+end
+
 require 'lib/stormmq'
 
 Spec::Rake::SpecTask.new(:spec) do |t|

@@ -8,6 +8,7 @@
 
 $:.unshift File.dirname(__FILE__)
 require 'stormmq/utils'
+require 'stormmq/base64_extensions'
 require 'stormmq/application'
 require 'stormmq/amqp'
 require 'stormmq/rest'

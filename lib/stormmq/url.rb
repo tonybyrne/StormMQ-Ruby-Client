@@ -6,7 +6,6 @@
 # for terms of use and redistribution.
 #++
 
-require 'rubygems'
 require 'uri'
 require 'cgi'
 require 'hmac'
@@ -28,7 +27,7 @@ module StormMQ
       else
         @url = URI.parse(url)
       end
-      raise StormMQ::Error::InvalidURLError, "'#{@url.to_s}' is not a valid URL." unless self.valid?
+      raise Error::InvalidURLError, "'#{@url.to_s}' is not a valid URL." unless self.valid?
     end
 
     def valid?
@@ -63,18 +62,18 @@ module StormMQ
       self.class.new(canonical)
     end
 
-    def sign(base64key, method='GET')
-      self.add_query_params('signature' => compute_signature(base64key, method))
+    def sign(secret_key, method='GET')
+      self.add_query_params('signature' => compute_signature(secret_key, method))
     end
 
-    def compute_signature(base64key, method='GET')
-      hmac = HMAC::SHA256.new(Base64.decode64(base64key))
+    def compute_signature(secret_key, method='GET')
+      hmac = HMAC::SHA256.new(secret_key)
       hmac.update("#{method.upcase}#{self.to_s}")
-      Base64.encode64(hmac.digest).tr("+/","-_").chomp
+      Base64.urlsafe_encode64(hmac.digest).chomp
     end
 
-    def canonicalise_and_sign(user, base64key, method='GET', verison=0)
-      self.canonicalise(user,verison).sign(base64key, method)
+    def canonicalise_and_sign(user, secret_key, method='GET', verison=0)
+      self.canonicalise(user,verison).sign(secret_key, method)
     end
 
     def to_h

@@ -6,7 +6,6 @@
 # for terms of use and redistribution.
 #++
 
-require 'rubygems'
 require 'mq'
 require 'pp'
 
