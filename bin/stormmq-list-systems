@@ -1,0 +1,39 @@
+#!/usr/bin/env ruby
+# encoding: utf-8
+#--
+# Copyright (c) 2010, Tony Byrne & StormMQ Ltd.
+# All rights reserved.
+#
+# Please refer to the LICENSE file that accompanies this source
+# for terms of use and redistribution.
+#++
+
+$:.unshift File.dirname(__FILE__) + '/../lib'
+
+begin
+  require 'commandline/optionparser'
+rescue LoadError
+  require 'rubygems'
+  retry
+end
+
+require 'stormmq'
+
+class StormMQ::Application::ListSystems < StormMQ::Application
+
+  def initialize
+    synopsis  "[--user USER]"
+    short_description "Lists the systems associated with a company"
+    long_description  ""
+    options :help
+    option_user
+    option_company
+  end
+
+  def main
+    self.rest_client.systems(opt.company).each {|c| puts c}
+  end
+
+end
+
+StormMQ::Application::ListSystems.run

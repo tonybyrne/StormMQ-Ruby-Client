@@ -1,0 +1,40 @@
+#!/usr/bin/env ruby
+# encoding: utf-8
+#--
+# Copyright (c) 2010, Tony Byrne & StormMQ Ltd.
+# All rights reserved.
+#
+# Please refer to the LICENSE file that accompanies this source
+# for terms of use and redistribution.
+#++
+
+$:.unshift File.dirname(__FILE__) + '/../lib'
+
+begin
+  require 'commandline/optionparser'
+rescue LoadError
+  require 'rubygems'
+  retry
+end
+
+require 'stormmq'
+
+class StormMQ::Application::DescribeSystem < StormMQ::Application
+
+  def initialize
+    synopsis  "[--user USER] --company COMPANY --system SYSTEM"
+    short_description "Describe a system"
+    long_description  ""
+    options :help
+    option_user
+    option_company
+    option_system
+  end
+
+  def main
+    puts self.rest_client.describe_system(opt.company, opt.system).to_yaml
+  end
+
+end
+
+StormMQ::Application::DescribeSystem.run

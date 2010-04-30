@@ -15,9 +15,9 @@ module StormMQ
   API                 = ENV['STORMMQ_API']         || "api"
   API_VERSION         = ENV['STORMMQ_API_VERSION'] || "2009-01-01"
 
-  LIST_COMPANIES_PATH = '/companies/'
-  LIST_CLUSTERS_PATH  = '/clusters'
-  LIST_APIS_PATH      = '/'
+  COMPANIES_PATH = '/companies/'
+  CLUSTERS_PATH  = '/clusters'
+  APIS_PATH      = '/'
 
   class Rest
 
@@ -56,18 +56,68 @@ module StormMQ
     end
 
     def companies
-      get(build_signed_resource_url(LIST_COMPANIES_PATH))
+      get(
+        build_signed_resource_url(COMPANIES_PATH)
+      )
+    end
+
+    def describe_company(company)
+      get(
+        build_signed_resource_url(
+          make_normalised_path(
+            COMPANIES_PATH,
+            escape(company)
+          )
+        )
+      )
+    end
+
+    def systems(company)
+      get(
+        build_signed_resource_url(
+          make_normalised_path(
+            COMPANIES_PATH,
+            escape(company),
+            '/'
+          )
+        )
+      )
+    end
+
+    def describe_system(company, system)
+      get(
+        build_signed_resource_url(
+          make_normalised_path(
+            COMPANIES_PATH,
+            escape(company),
+            escape(system)
+          )
+        )
+      )
     end
 
     def clusters(company)
-      get(build_signed_resource_url(LIST_CLUSTERS_PATH + '/' + StormMQ::URL.escape(company)))
+      get(
+        build_signed_resource_url(
+          make_normalised_path(
+            CLUSTERS_PATH,
+            escape(company)
+          )
+        )
+      )
     end
 
     def apis
-      get(build_signed_resource_url(LIST_APIS_PATH))
+      get(
+        build_signed_resource_url(APIS_PATH)
+      )
     end
 
     private
+
+    def escape(string)
+      StormMQ::URL.escape(string)
+    end
 
     def get(signed_url)
       JSON.parse(RestClient.get(signed_url.to_s, {:accept => '*/*'}).to_s)

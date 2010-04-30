@@ -33,14 +33,26 @@ module StormMQ
              :opt_not_found   => CommandLine::OptionParser::OPT_NOT_FOUND_BUT_REQUIRED
     end
 
+    def option_system
+      option :names           => %w(--system -s),
+             :opt_description => "the system identifier, usually the same as --user",
+             :arity           => [1,1],
+             :opt_found       => get_args,
+             :opt_not_found   => CommandLine::OptionParser::OPT_NOT_FOUND_BUT_REQUIRED
+    end
+
     def rest_client
       begin
         Rest.client(:user => opt.user)
       rescue Error::UserNotProvidedError
         raise "Could not determine the user - either provide it via the --user option or set it via $STORMMQ_USER"
       rescue Error::SecretKeyNotProvidedError
-        raise "Could not find the secret key for user '#{opt.user} - please ensure it is present in the secret key file"
+        raise "Could not find the secret key for user '#{self.user}' - please ensure it is present in the secret key file"
       end
+    end
+
+    def user
+      opt.user || ENV['STORMMQ_USER']
     end
 
   end

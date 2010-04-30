@@ -1,0 +1,39 @@
+#!/usr/bin/env ruby
+# encoding: utf-8
+#--
+# Copyright (c) 2010, Tony Byrne & StormMQ Ltd.
+# All rights reserved.
+#
+# Please refer to the LICENSE file that accompanies this source
+# for terms of use and redistribution.
+#++
+
+$:.unshift File.dirname(__FILE__) + '/../lib'
+
+begin
+  require 'commandline/optionparser'
+rescue LoadError
+  require 'rubygems'
+  retry
+end
+
+require 'stormmq'
+
+class StormMQ::Application::DescribeCompany < StormMQ::Application
+
+  def initialize
+    synopsis  "[--user USER]"
+    short_description "Lists the details stored for your company, including your current account details"
+    long_description  ""
+    options :help
+    option_user
+    option_company
+  end
+
+  def main
+    puts self.rest_client.describe_company(opt.company).to_yaml
+  end
+
+end
+
+StormMQ::Application::DescribeCompany.run
