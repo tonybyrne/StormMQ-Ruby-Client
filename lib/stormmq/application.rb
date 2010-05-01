@@ -43,7 +43,7 @@ module StormMQ
 
     def rest_client
       begin
-        Rest.client(:user => opt.user)
+        Rest.new(:user => opt.user)
       rescue Error::UserNotProvidedError
         raise "Could not determine the user - either provide it via the --user option or set it via $STORMMQ_USER"
       rescue Error::SecretKeyNotProvidedError
