@@ -11,9 +11,9 @@ require "rest_client"
 
 module StormMQ
 
-  API_HOST            = ENV['STORMMQ_HOST']        || "api.stormmq.com"
-  API                 = ENV['STORMMQ_API']         || "api"
-  API_VERSION         = ENV['STORMMQ_API_VERSION'] || "2009-01-01"
+  API_HOST       = ENV['STORMMQ_HOST']        || "api.stormmq.com"
+  API            = ENV['STORMMQ_API']         || "api"
+  API_VERSION    = ENV['STORMMQ_API_VERSION'] || "2009-01-01"
 
   COMPANIES_PATH = '/companies/'
   CLUSTERS_PATH  = '/clusters'
@@ -46,7 +46,7 @@ module StormMQ
       end
 
       unless @secret_key = options.delete(:secret_key) || self.class.secret_key_from_key_store(@user)
-        raise Error::SecretKeyNotProvidedError, "could not determine the secret key for user '#{user}' - either provide it via the :secret_key param or ensure it is available in the secret key file",
+        raise Error::SecretKeyNotProvidedError, "could not determine the secret key for user '#{@user}' - either provide it via the :secret_key param or ensure it is available in the secret key file",
           caller
       end
 
@@ -59,67 +59,37 @@ module StormMQ
 
     # Returns an Array of company indentifiers associated with the user.
     def companies
-      get(
-        build_signed_resource_url(COMPANIES_PATH)
-      )
+      signed_get(COMPANIES_PATH)
     end
 
     # Takes a String containing a valid company identifier and returns a
     # Hash representation of the detailed information stored on the StormMQ
     # system about the company.
     def describe_company(company)
-      get(
-        build_signed_resource_url(
-          make_normalised_path(
-            COMPANIES_PATH,
-            escape(company)
-          )
-        )
-      )
+      signed_get(COMPANIES_PATH, escape(company))
     end
 
     def systems(company)
-      get(
-        build_signed_resource_url(
-          make_normalised_path(
-            COMPANIES_PATH,
-            escape(company),
-            '/'
-          )
-        )
-      )
+      signed_get(COMPANIES_PATH, escape(company), '/')
     end
 
     def describe_system(company, system)
-      get(
-        build_signed_resource_url(
-          make_normalised_path(
-            COMPANIES_PATH,
-            escape(company),
-            escape(system)
-          )
-        )
-      )
+      signed_get(COMPANIES_PATH, escape(company), escape(system))
     end
 
     def clusters(company)
-      get(
-        build_signed_resource_url(
-          make_normalised_path(
-            CLUSTERS_PATH,
-            escape(company)
-          )
-        )
-      )
+      signed_get(CLUSTERS_PATH, escape(company))
     end
 
     def apis
-      get(
-        build_signed_resource_url(APIS_PATH)
-      )
+      signed_get(APIS_PATH)
     end
 
     private
+
+    def signed_get(*path_args)
+      get(build_signed_resource_url(make_normalised_path(*path_args)))
+    end
 
     def escape(string) # :nodoc:
       StormMQ::URL.escape(string)
@@ -141,18 +111,6 @@ module StormMQ
 
     def make_normalised_path(*args) # :nodoc:
       ('/' + args.join('/')).gsub(/\/+/,'/')
-    end
-
-    def self.determine_user(options) # :nodoc:
-      user_from_options(options) || ENV['STORMMQ_USER']
-    end
-
-    def self.user_from_options(options={}) # :nodoc:
-      options.delete(:user)
-    end
-
-    def self.secret_key_from_options(options={}) # :nodoc:
-      options.delete(:secret_key)
     end
 
     def self.secret_key_from_key_store(user) # :nodoc:

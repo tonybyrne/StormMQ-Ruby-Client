@@ -20,7 +20,7 @@ module StormMQ
 
     def option_user
       option :names           => %w(--user -u),
-             :opt_description => "a valid user name, i.e. the login you use at http://stormmq.com/",
+             :opt_description => "a valid user name, i.e. the user name that you registered with",
              :arity           => [1,1],
              :opt_found       => get_args
     end

@@ -10,11 +10,13 @@
 
 $:.unshift File.dirname(__FILE__) + '/../lib'
 
+require 'yaml'
+
 begin
   require 'commandline/optionparser'
 rescue LoadError
   require 'rubygems'
-  retry
+  require 'commandline/optionparser'
 end
 
 require 'stormmq'
@@ -22,16 +24,23 @@ require 'stormmq'
 class StormMQ::Application::ListSystems < StormMQ::Application
 
   def initialize
-    synopsis  "[--user USER]"
-    short_description "Lists the systems associated with a company"
-    long_description  ""
+    synopsis "[--help] | [--user USER] COMPANY"
+
+    short_description "Lists all the systems known for a company"
+    long_description  <<-EOF
+To use this program, you must have added USER and secret key (not amqpUserPassword; key is 44 characters long)
+to either /etc/stormmq/secret-keys.json or ~/.stormmq/secret-keys.json.
+If your secret key contains a '/' character, then you must escape it as '\/'
+    EOF
     options :help
     option_user
-    option_company
+    expected_args :company
   end
 
   def main
-    self.rest_client.systems(opt.company).each {|c| puts c}
+    puts ARGV.to_yaml
+
+    # self.rest_client.systems(opt.company).each {|c| puts c}
   end
 
 end
