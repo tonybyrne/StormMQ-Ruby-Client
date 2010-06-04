@@ -11,17 +11,18 @@
 $:.unshift File.join(File.expand_path(File.dirname(__FILE__)), "..", "lib")
 
 require 'stormmq/application'
+require 'json'
 
 class StormMQ::Application::GetAMQPUserPassword < StormMQ::Application
 
   def initialize
-    synopsis "--help | <userName> <systemName> <companyName> <environmentName> <amqpUserName>"
+    synopsis "--help | <userName> <systemName> <companyName> <environmentName>"
     options :help
-    expected_args :user, :system, :company, :environment, :amqp_user
+    expected_args :user, :system, :company, :environment
   end
 
   def main
-    puts self.rest_client(@user).amqp_password(@company, @system, @environment, @amqp_user)
+    puts JSON.pretty_generate(self.rest_client(@user).amqp_users(@company, @system, @environment))
   end
 
   def man
@@ -32,15 +33,15 @@ NAME
 
 PURPOSE
 
-  Gets the password for a given AMQP user name. For a recently signed
+  Lists all the AMQP user names and passwords. For a recently signed
   up user, we've created you a default system with a default AMQP
-  user name (amqpUserName) the same as your userName. This is the
-  only tool you'll need initially.
+  user name (amqpUserName) the same as your userName, so you don't
+  need this tool yet.
 
 USAGE
 
   #{File.basename(__FILE__)} --help
-  #{File.basename(__FILE__)} <userName> <systemName> <companyName> <environmentName> <amqpUserName>
+  #{File.basename(__FILE__)} <userName> <systemName> <companyName> <environmentName>
 
   For ordinary users, your companyName is the same as your userName.
 
@@ -89,34 +90,22 @@ PARAMETERS
     system created by stormmq-create-system <userName>
     (except advanced use).
 
-  <amqpUserName>
-
-    This is your userName for the default system we created when you
-    signed up, or for any system created by
-    stormmq-create-system <userName> (except advanced use).
-
   --help, -h
 
     Displays this help page then quits.
 
 RESULT
 
-  Outputs a simple JSON object of string keys (user names to use with
-  AMQP) to string values (AMQP passwords, to be used as is without
-  decoding but excluding the quotes).
-
-  If using the default system created when you signed up, then the user
-  name to log on to AMQP ('amqpUserName') will be the same as your
-  userName.
+  Outputs just one string which is your AMQP password for the
+  amqpUserName. Use this to log on with.
 
 REST API
 
-  Equivalent is GET /companies/<companyName>/<systemName>/<environmentName>/users/.
+  Equivalent is GET /companies/<companyName>/<systemName>/<environmentName>/users/<amqpUserName>.
 
 NOTES
 
-  Pretty prints JSON, so not suitable for use with XHTML, etc, response
-  documents.
+  Output is not JSON, so not suitable for use with XHTML, etc, response documents.
 
   To find you companyName, use:
 

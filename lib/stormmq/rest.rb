@@ -66,6 +66,10 @@ module StormMQ
       signed_get(COMPANIES_PATH, escape(company), escape(system))
     end
 
+    def delete_system(company, system)
+      signed_delete(COMPANIES_PATH, escape(company), escape(system))
+    end
+
     def clusters(company)
       signed_get(CLUSTERS_PATH, escape(company))
     end
@@ -78,10 +82,18 @@ module StormMQ
       signed_get(COMPANIES_PATH, escape(company), escape(system), escape(environment), 'users', escape(amqp_user))
     end
 
+    def amqp_users(company, system, environment)
+      signed_get(COMPANIES_PATH, escape(company), escape(system), escape(environment), 'users/')
+    end
+
     private
 
     def signed_get(*path_args)
       get(build_signed_resource_url(make_normalised_path(*path_args)))
+    end
+
+    def signed_delete(*path_args)
+      delete(build_signed_resource_url(make_normalised_path(*path_args), 'DELETE'))
     end
 
     def escape(string) # :nodoc:
@@ -90,6 +102,10 @@ module StormMQ
 
     def get(signed_url) # :nodoc:
       JSON.parse(RestClient.get(signed_url.to_s, {:accept => '*/*'}).to_s)
+    end
+
+    def delete(signed_url) # :nodoc:
+      JSON.parse(RestClient.delete(signed_url.to_s, {:accept => '*/*'}).to_s)
     end
 
     def build_signed_resource_url(resource_path='/', method='GET') # :nodoc:

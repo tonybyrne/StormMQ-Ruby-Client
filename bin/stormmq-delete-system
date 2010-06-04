@@ -1,0 +1,117 @@
+#!/usr/bin/env ruby
+# encoding: utf-8
+#--
+# Copyright (c) 2010, Tony Byrne & StormMQ Ltd.
+# All rights reserved.
+#
+# Please refer to the LICENSE file that accompanies this source
+# for terms of use and redistribution.
+#++
+
+$:.unshift File.join(File.expand_path(File.dirname(__FILE__)), "..", "lib")
+
+require 'stormmq/application'
+
+class StormMQ::Application::DescribeSystem < StormMQ::Application
+
+  def initialize
+    synopsis  "--help | <userName> | <userName> <systemName> | <userName> <systemName> <companyName>"
+    options :help
+    expected_args [1,3]
+  end
+
+  def main
+    user    = argv[0]
+    system  = argv[1] || user
+    company = argv[2] || user
+    self.rest_client(user).delete_system(company, system)
+  end
+
+  def man
+    <<-EOM
+NAME
+
+  #{File.basename(__FILE__)}
+
+PURPOSE
+
+ Deletes systems PERMANENTLY, with no chance of recovery. You can
+ recreate the system, of course, if you kept your settings.
+ You will just lose any messages in the meantime.
+
+USAGE
+
+  #{File.basename(__FILE__)} --help
+  #{File.basename(__FILE__)} <userName>
+  #{File.basename(__FILE__)} <userName> <systemName>
+  #{File.basename(__FILE__)} <userName> <systemName> <companyName>
+
+  The second form assumes your companyName and systemName is the same
+  as your userName. This is true for ordinary users who've just
+  signed up.
+
+  The third form assumes your companyName is the same as your
+  userName. This is true for ordinary users.
+
+PARAMETERS
+
+  <userName>
+
+    The user name you log into the site with.
+
+  <systemName>
+
+    If you're not sure if you've already created a system, use:
+
+    stormmq-list-systems <userName>
+
+    A systemName can not contain a '/' or ':'
+
+  <companyName>
+
+    For ordinary users, this is the same as your userName. If you're
+    not sure of your companyName, you can retrieve it with:
+
+    stormmq-list-companies <userName>
+
+  --help, -h
+
+    Displays this help page then quits.
+
+RESULT
+
+  Outputs nothing.
+
+REST API
+
+  Equivalent is DELETE /companies/<companyName>/<systemName>.
+
+NOTES
+
+  To find you companyName, use:
+
+    stormmq-list-companies
+
+  To delete your default system, use:
+
+    stormmq-delete-system <userName>
+
+  To create a new system, use:
+
+    stormmq-create-system <userName> <systemName>
+
+COPYRIGHT
+
+  Copyright (c) 2010, Tony Byrne & StormMQ Ltd.
+  All rights reserved.
+
+SELF TEST
+
+  #{self_test}
+
+    EOM
+  end
+
+end
+
+StormMQ::Application::DescribeSystem.run
