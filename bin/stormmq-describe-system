@@ -25,7 +25,7 @@ class StormMQ::Application::DescribeSystem < StormMQ::Application
     user    = argv[0]
     system  = argv[1] || user
     company = argv[2] || user
-    puts JSON.pretty_generate self.rest_client(user).describe_system(company, system)
+    puts JSON.pretty_generate(self.rest_client(user).describe_system(company, system))
   end
 
   def man

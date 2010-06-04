@@ -6,13 +6,8 @@
 # for terms of use and redistribution.
 #++
 
-begin
-  require 'rake'
-  require 'spec/rake/spectask'
-rescue
-  require 'rubygems'
-  retry
-end
+require 'rake'
+require 'spec/rake/spectask'
 
 require 'lib/stormmq'
 

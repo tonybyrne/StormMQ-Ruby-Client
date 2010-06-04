@@ -23,7 +23,7 @@ class StormMQ::Application::ListClusters < StormMQ::Application
   def main
     user    = argv[0]
     company = argv[1] || user
-    puts JSON.pretty_generate self.rest_client(user).clusters(company)
+    puts JSON.pretty_generate(self.rest_client(user).clusters(company))
   end
 
   def man

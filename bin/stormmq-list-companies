@@ -22,7 +22,7 @@ class StormMQ::Application::ListCompanies < StormMQ::Application
   end
 
   def main
-    puts JSON.pretty_generate self.rest_client(@user).companies
+    puts JSON.pretty_generate(self.rest_client(@user).companies)
   end
 
   def man
