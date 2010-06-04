@@ -74,6 +74,10 @@ module StormMQ
       signed_get(APIS_PATH)
     end
 
+    def amqp_password(company, system, environment, amqp_user)
+      signed_get(COMPANIES_PATH, escape(company), escape(system), escape(environment), 'users', escape(amqp_user))
+    end
+
     private
 
     def signed_get(*path_args)
