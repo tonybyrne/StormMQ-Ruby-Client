@@ -22,7 +22,7 @@ class StormMQ::Application::ListCompanies < StormMQ::Application
   end
 
   def main
-    puts self.rest_client(@user).companies.to_json
+    puts JSON.pretty_generate self.rest_client(@user).companies
   end
 
   def man
@@ -71,6 +71,11 @@ NOTES
 
   Security prevents you from obtaining information about which other
   users belong to which companies.
+
+COPYRIGHT
+
+  Copyright (c) 2010, Tony Byrne & StormMQ Ltd.
+  All rights reserved.
 
 SELF TEST
 

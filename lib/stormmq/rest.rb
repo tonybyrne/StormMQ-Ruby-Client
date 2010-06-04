@@ -27,24 +27,10 @@ module StormMQ
 
   class Rest
 
-    # Creates configured instances of the Rest client.
-    # == Examples
-    #
-    # New client with configuration defaulted or inferred. User name is taken
-    # from ENV['STORMMQ_USER'] if set. Secret key for the user is looked up
-    # in the secret key file.
-    #   client = StormMQ::Rest.new
-    #
-    #
-    #  # Client configured for a specific user and that user's secret key looked up in the secret key file.
-    #  client = StormMQ::Rest.new(:user => 'tonybyrne')
-    #
-    #  # Explicit secret key, i.e. the secret key file is not consulted or required.
-    #  client = StormMQ::Rest.new(:user => 'tonybyrne', :secret_key => a_secret_key)
     def initialize(options={})
-      unless @user = options.delete(:user) || ENV['STORMMQ_USER']
+      unless @user = options.delete(:user)
         raise Error::UserNotProvidedError,
-          "could not determine the user name - either provide it via the :user param or set it via the STORMMQ_USER environment variable",
+          "could not determine the user name - either provide it via the :user param",
             caller
       end
 

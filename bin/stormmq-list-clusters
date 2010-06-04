@@ -8,31 +8,92 @@
 # for terms of use and redistribution.
 #++
 
-$:.unshift File.dirname(__FILE__) + '/../lib'
+$:.unshift File.join(File.expand_path(File.dirname(__FILE__)), "..", "lib")
 
-begin
-  require 'commandline/optionparser'
-rescue LoadError
-  require 'rubygems'
-  retry
-end
-
-require 'stormmq'
+require 'stormmq/application'
 
 class StormMQ::Application::ListClusters < StormMQ::Application
 
   def initialize
-    synopsis  "[--user USER] --company COMPANY"
-    short_description "Lists the companies available to you (typically one)"
-    long_description  ""
+    synopsis  "--help | <userName> | <userName> <companyName>"
     options :help
-    option_user
-    option_company
-
+    expected_args [1,2]
   end
 
   def main
-    self.rest_client.clusters(opt.company).each {|c| puts c}
+    user    = argv[0]
+    company = argv[1] || user
+    puts JSON.pretty_generate self.rest_client(user).clusters(company)
+  end
+
+  def man
+    <<-EOM
+NAME
+
+  #{File.basename(__FILE__)}
+
+PURPOSE
+
+  Lists the names of the clusters in our Messaging Cloud you can
+  access through your company. You'll need this information if you're
+  creating complex system-environment combinations.
+
+  Currently, the only cluster everyone can access is free-1.
+
+  Ordinary users can only access free clusters. If you're sending a
+  lot of messages, you might want to use Contended Clusters or
+  Co-Located Dedicated Clusters. Please ask us for more information.
+
+USAGE
+
+  #{File.basename(__FILE__)} --help
+  #{File.basename(__FILE__)} <userName>
+  #{File.basename(__FILE__)} <userName> <companyName>
+
+  The second form assumes your companyName is the same as your
+  userName. This is true for ordinary users.
+
+PARAMETERS
+
+  <userName>
+
+    The user name you log into the site with.
+
+  <companyName>
+
+    For ordinary users, this is the same as your userName. If you're
+    not sure of your companyName, you can retrieve it with:
+
+    stormmq-list-companies <userName>
+
+  --help, -h
+
+    Displays this help page then quits.
+
+RESULT
+
+  Outputs a simple JSON list of strings to STDOUT.
+
+REST API
+
+  Equivalent is GET /clusters/<companyName>.
+
+NOTES
+
+  To find you companyName, use:
+
+    stormmq-list-companies
+
+COPYRIGHT
+
+  Copyright (c) 2010, Tony Byrne & StormMQ Ltd.
+  All rights reserved.
+
+SELF TEST
+
+  #{self_test}
+
+    EOM
   end
 
 end

@@ -8,29 +8,27 @@
 # for terms of use and redistribution.
 #++
 
-$:.unshift File.dirname(__FILE__) + '/../lib'
+$:.unshift File.join(File.expand_path(File.dirname(__FILE__)), "..", "lib")
 
-begin
-  require 'commandline/optionparser'
-rescue LoadError
-  require 'rubygems'
-  retry
-end
-
-require 'stormmq'
+require 'stormmq/secret_keys'
+require 'stormmq/application'
 
 class StormMQ::Application::URLSigner < StormMQ::Application
 
   def initialize
-    synopsis  "--user USER [--method METHOD] --url URL"
+    synopsis  "--help | --user <userName> --method <HttpMethod> --url <URL>"
     short_description "Signs a URL for use with StormMQ's RESTful API"
     long_description  ""
     options :help
-    option_user
+
+    option :names           => %w(--user -u),
+           :opt_description => "a valid user name, i.e. the user name that you log into the site with",
+           :arity           => [1,1],
+           :opt_found       => get_args
 
     option  :names           => %w(--method -m),
             :opt_description => "the HTTP method to use - defaults to 'GET'",
-            :arity           => [0,1],
+            :arity           => [1,1],
             :opt_found       => get_args,
             :opt_not_found   => 'GET'
 
@@ -42,13 +40,74 @@ class StormMQ::Application::URLSigner < StormMQ::Application
   end
 
   def main
-    puts self.url.canonicalise_and_sign(opt.user, self.secret_key, opt['--method'])
+    puts self.url.canonicalise_and_sign(opt.user, self.secret_key(opt.user), opt['--method'])
+  end
+
+  def man
+    <<-EOM
+NAME
+
+  #{File.basename(__FILE__)}
+
+PURPOSE
+
+  Use this to experiment with the how signing URLs works if you need
+  a reference implementation.
+
+USAGE
+
+  #{File.basename(__FILE__)} --help
+  #{File.basename(__FILE__)} --user <userName> --method <HttpMethod> --url <URL>
+
+PARAMETERS
+
+  --user
+
+    The user name you log in to this site with.
+
+  --method
+
+    One of:
+
+    * GET
+    * HEAD
+    * OPTIONS
+    * PUT
+    * DELETE
+
+    POST is not yet supported.
+
+  --url
+
+    The unsigned URL to be signed.
+
+  --help, -h
+
+    Displays this help page then quits.
+
+RESULT
+
+  Outputs a signed URL to STDOUT.
+
+NOTES
+
+  Advanced use only - commandline subject to change.
+
+COPYRIGHT
+
+  Copyright (c) 2010, Tony Byrne & StormMQ Ltd.
+  All rights reserved.
+
+    EOM
   end
 
   def url
     StormMQ::URL.new(opt.url)
   end
 
+  def secret_key(user) # :nodoc:
+    StormMQ::SecretKeys.key_for(user)
+  end
 end
 
 StormMQ::Application::URLSigner.run

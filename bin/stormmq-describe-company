@@ -8,24 +8,97 @@
 # for terms of use and redistribution.
 #++
 
-$:.unshift File.dirname(__FILE__) + '/../lib'
+$:.unshift File.join(File.expand_path(File.dirname(__FILE__)), "..", "lib")
 
-require 'commandline/optionparser'
-require 'stormmq'
+require 'stormmq/application'
+require 'json'
 
 class StormMQ::Application::DescribeCompany < StormMQ::Application
 
   def initialize
-    synopsis  "[--user USER]"
-    short_description "Lists the details stored for your company, including your current account details"
-    long_description  ""
+    synopsis  "--help | <userName>"
     options :help
-    option_user
-    option_company
+    expected_args [1,2]
   end
 
   def main
-    puts self.rest_client.describe_company(opt.company).to_yaml
+    user    = argv[0]
+    company = argv[1] || user
+    puts JSON.pretty_generate self.rest_client(user).describe_company(company)
+  end
+
+  def man
+    <<-EOM
+NAME
+
+  #{File.basename(__FILE__)}
+
+PURPOSE
+
+  Describes all the details we have for your company, including every
+  single connection you've made to our Messaging Cloud, how much
+  bandwidth you've used, your current account credits and debits and
+  invoice contact details. Some of the details of this API are in
+  flux. We'd like your feedback in the forums on how to improve it!
+
+USAGE
+
+  #{File.basename(__FILE__)} --help
+  #{File.basename(__FILE__)} <userName>
+  #{File.basename(__FILE__)} <userName> <companyName>
+
+  The second form assumes your companyName is the same as your
+  userName. This is true for ordinary users.
+
+PARAMETERS
+
+  <userName>
+
+    The user name you log into the site with.
+
+  <companyName>
+
+    For ordinary users, this is the same as your userName. If you're
+    not sure of your companyName, you can retrieve it with:
+
+    stormmq-list-companies <userName>
+
+  --help, -h
+
+    Displays this help page then quits.
+
+RESULT
+
+  Outputs a simple JSON list of strings to STDOUT.
+
+REST API
+
+  Equivalent is GET /companies/<companyName>/.
+
+NOTES
+
+  To find you companyName, use:
+
+    stormmq-list-companies
+
+  To delete your default system, use:
+
+    stormmq-delete-system <userName>
+
+  To create a new system, use:
+
+    stormmq-create-system <userName> <systemName>
+
+COPYRIGHT
+
+  Copyright (c) 2010, Tony Byrne & StormMQ Ltd.
+  All rights reserved.
+
+SELF TEST
+
+  #{self_test}
+
+    EOM
   end
 
 end

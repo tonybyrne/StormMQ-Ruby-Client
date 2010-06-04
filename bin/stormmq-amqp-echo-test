@@ -8,17 +8,15 @@
 # for terms of use and redistribution.
 #++
 
-$:.unshift File.dirname(__FILE__) + '/../lib'
+$:.unshift File.join(File.expand_path(File.dirname(__FILE__)), "..", "lib")
 
-require 'commandline/optionparser'
-require 'stormmq'
+require 'stormmq/amqp'
+require 'stormmq/application'
 
 class StormMQ::Application::AMQPEchoTest < StormMQ::Application
 
   def initialize
-    synopsis  "--amqpUser USER --amqpPassword PASSWORD --company COMPANY --system SYSTEM --environment ENVIRONMENT [--host HOST] [--port PORT]"
-    short_description "Verifies the ability to interact with StormMQ's message cloud service"
-    long_description  ""
+    synopsis  "--help | --company <companyName> --system <systemName> --environment <environmentName> --amqpUser <amqpUserName> --amqpPassword <amqpUserPassword> [--host <host>] [--port <port>] [--debug]"
     options :help, :debug
 
     option  :names           => %w(--host),
@@ -107,6 +105,98 @@ class StormMQ::Application::AMQPEchoTest < StormMQ::Application
 
     end
 
+  end
+
+  def man
+    <<-EOM
+NAME
+
+  #{File.basename(__FILE__)}
+
+PURPOSE
+
+  Tests connections to our AMQP servers (default: amqp.stormmq.com)
+  to try to troubleshoot problems with users, passwords and SSL.
+
+USAGE
+
+  #{File.basename(__FILE__)} --help
+  #{File.basename(__FILE__)} --company <companyName> --system <systemName> --environment <environmentName> --amqpUser <amqpUserName> --amqpPassword <amqpUserPassword>
+
+PARAMETERS
+
+  <systemName>
+
+    If you're not sure if you've already created a system, use:
+
+    stormmq-list-systems <userName>
+
+    Note: A systemName can not contain a '/' or ':'
+
+  <companyName>
+
+    For ordinary users, this is the same as your userName. If you're
+    not sure of your companyName, you can retrieve it with:
+
+    stormmq-list-companies <userName>
+
+  <environmentName>
+
+    One of:
+
+      * development
+      * testing
+      * production
+
+    for the default system created when you signed up, or for any
+    system created by stormmq-create-system <userName>
+    (except advanced use).
+
+  <amqpUserName>
+
+    This is your userName for the default system we created when you
+    signed up, or for any system created by
+    stormmq-create-system <userName> (except advanced use).
+
+  <amqpUserPassword>
+
+   Retrieve this using:
+
+   stormmq-get-amqpuser-password <userName> <companyName> <systemName> \\
+      <environmentName> <amqpUserName>
+
+  --help, -h
+
+    Displays this help page then quits.
+
+  --debug, -d
+
+    Display dialogue between client and server.
+
+  --host
+
+    Specify the amqp server to connect to. Defaults to:
+
+      amqp.stormmq.com
+
+  --port
+
+    Specify the port on the amqp server to connect to.
+
+RESULT
+
+  Outputs test results to STDOUT.
+
+NOTES
+
+  For a default system, you'll just need your userName.
+
+COPYRIGHT
+
+  Copyright (c) 2010, Tony Byrne & StormMQ Ltd.
+  All rights reserved.
+
+    EOM
   end
 
 end

@@ -8,25 +8,126 @@
 # for terms of use and redistribution.
 #++
 
-$:.unshift File.dirname(__FILE__) + '/../lib'
+$:.unshift File.join(File.expand_path(File.dirname(__FILE__)), "..", "lib")
 
-require 'commandline/optionparser'
-require 'stormmq'
+require 'stormmq/application'
+require 'json'
 
 class StormMQ::Application::DescribeSystem < StormMQ::Application
 
   def initialize
-    synopsis  "[--user USER] --company COMPANY --system SYSTEM"
-    short_description "Describe a system"
-    long_description  ""
+    synopsis  "--help | <userName> | <userName> <systemName> | <userName> <systemName> <companyName>"
     options :help
-    option_user
-    option_company
-    option_system
+    expected_args [1,3]
   end
 
   def main
-    puts self.rest_client.describe_system(opt.company, opt.system).to_yaml
+    user    = argv[0]
+    system  = argv[1] || user
+    company = argv[2] || user
+    puts JSON.pretty_generate self.rest_client(user).describe_system(company, system)
+  end
+
+  def man
+    <<-EOM
+NAME
+
+  #{File.basename(__FILE__)}
+
+PURPOSE
+
+ A system is a logical view of resources in our Messaging Cloud.
+ Typically you'd only need one system, eg 'AccountRocks',
+ 'InflationSwapCalculator', 'Jibbit-X', etc. A system has
+ environments.
+
+ A company-system-environment triplet matches an AMQP Virtual Host.
+ E.g., if your company is widgetcorp, your system is accountrock and
+ you want to use an environment of development, your AMQP virtual
+ host name is widgetcorp/accountrock/development.
+
+ If you've just signed up as an ordinary user, then we've already
+ created a system called <userName>for you (see stormmq-list-systems),
+ with an AMQP virtual host called /<userName>/<userName>/development,
+ accessible at amqp.stormmq.com.
+
+ All AMQP virtual hosts are virtually hosted on amqp.stormmq.com.
+
+ To find the passwords to log onto them with AMQP, use:
+
+ stormmq-get-amqpuser-password
+
+USAGE
+
+  #{File.basename(__FILE__)} --help
+  #{File.basename(__FILE__)} <userName>
+  #{File.basename(__FILE__)} <userName> <systemName>
+  #{File.basename(__FILE__)} <userName> <systemName> <companyName>
+
+  The second form assumes your companyName and systemName is the same
+  as your userName. This is true for ordinary users who've just
+  signed up.
+
+  The third form assumes your companyName is the same as your
+  userName. This is true for ordinary users.
+
+PARAMETERS
+
+  <userName>
+
+    The user name you log into the site with.
+
+  <systemName>
+
+    If you're not sure if you've already created a system, use:
+
+    stormmq-list-systems <userName>
+
+    A systemName can not contain a '/' or ':'
+
+  <companyName>
+
+    For ordinary users, this is the same as your userName. If you're
+    not sure of your companyName, you can retrieve it with:
+
+    stormmq-list-companies <userName>
+
+  --help, -h
+
+    Displays this help page then quits.
+
+RESULT
+
+  Outputs a pretty-printed complex JSON list to standard out.
+
+REST API
+
+  Equivalent is GET /companies/<companyName>/<systemName>.
+
+NOTES
+
+  To find you companyName, use:
+
+    stormmq-list-companies
+
+  To delete your default system, use:
+
+    stormmq-delete-system <userName>
+
+  To create a new system, use:
+
+    stormmq-create-system <userName> <systemName>
+
+COPYRIGHT
+
+  Copyright (c) 2010, Tony Byrne & StormMQ Ltd.
+  All rights reserved.
+
+SELF TEST
+
+  #{self_test}
+
+    EOM
   end
 
 end

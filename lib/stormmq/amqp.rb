@@ -33,7 +33,10 @@ module StormMQ
               :version     => VERSION
             },
             'AMQPLAIN',
-            Utils.stormmq_credentials_string(@settings[:user], @settings[:password]),
+            {
+              :LOGIN => @settings[:user],
+              :PASSWORD => @settings[:password]
+            },
             'en_US'
           )
 

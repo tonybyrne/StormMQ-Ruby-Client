@@ -18,14 +18,13 @@ class StormMQ::Application::ListSystems < StormMQ::Application
   def initialize
     synopsis "--help | <userName> | <userName> <companyName>"
     options :help
-    option_user
     expected_args [1,2]
   end
 
   def main
     user    = argv[0]
     company = argv[1] || user
-    self.rest_client(user).systems(company).each {|c| puts c}
+    puts JSON.pretty_generate self.rest_client(user).systems(company)
   end
 
   def man
@@ -50,6 +49,9 @@ USAGE
   #{File.basename(__FILE__)} --help
   #{File.basename(__FILE__)} <userName>
   #{File.basename(__FILE__)} <userName> <companyName>
+
+  The second form assumes your companyName is the same as your
+  userName. This is true for ordinary users.
 
 PARAMETERS
 
@@ -90,6 +92,11 @@ NOTES
   To create a new system, use:
 
     stormmq-create-system <userName> <systemName>
+
+COPYRIGHT
+
+  Copyright (c) 2010, Tony Byrne & StormMQ Ltd.
+  All rights reserved.
 
 SELF TEST
 
