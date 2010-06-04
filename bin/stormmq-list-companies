@@ -8,29 +8,75 @@
 # for terms of use and redistribution.
 #++
 
-$:.unshift File.dirname(__FILE__) + '/../lib'
+$:.unshift File.join(File.expand_path(File.dirname(__FILE__)), "..", "lib")
 
-begin
-  require 'commandline/optionparser'
-rescue LoadError
-  require 'rubygems'
-  retry
-end
-
-require 'stormmq'
+require 'stormmq/application'
+require 'json'
 
 class StormMQ::Application::ListCompanies < StormMQ::Application
 
   def initialize
-    synopsis  "[--user USER]"
-    short_description "Lists the companies available to you (typically one)"
-    long_description  ""
-    options :help
-    option_user
+    synopsis      "--help | <userName>"
+    options       :help
+    expected_args :user
   end
 
   def main
-    self.rest_client.companies.each {|c| puts c}
+    puts self.rest_client(@user).companies.to_json
+  end
+
+  def man
+    <<-EOM
+NAME
+
+  #{File.basename(__FILE__)}
+
+PURPOSE
+
+  Lists the names of all the companies you belong to. Ordinary users
+  belong to only one company. For ordinary users, your userName is
+  the same as your companyName. For example, if you signed up as
+  'bob', then your userName is bob and your company is bob.
+
+USAGE
+
+  #{File.basename(__FILE__)} --help
+  #{File.basename(__FILE__)} <userName>
+
+PARAMETERS
+
+  <userName>
+
+    The user name you log into the site with. When provided, lists
+    the companies associated with that user name.
+
+    Note:
+
+  --help, -h
+
+    Displays this help page then quits.
+
+RESULT
+
+  Outputs a simple JSON list of strings to STDOUT.
+
+REST API
+
+  Equivalent is 'GET /companies/'.
+
+NOTES
+
+  Use #{File.basename(__FILE__)} to find your companyName for
+  use with the other tools.
+
+  Security prevents you from obtaining information about which other
+  users belong to which companies.
+
+SELF TEST
+
+  #{self_test}
+
+    EOM
   end
 
 end

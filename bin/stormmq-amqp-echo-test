@@ -10,13 +10,7 @@
 
 $:.unshift File.dirname(__FILE__) + '/../lib'
 
-begin
-  require 'commandline/optionparser'
-rescue LoadError
-  require 'rubygems'
-  retry
-end
-
+require 'commandline/optionparser'
 require 'stormmq'
 
 class StormMQ::Application::AMQPEchoTest < StormMQ::Application

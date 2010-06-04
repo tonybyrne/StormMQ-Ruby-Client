@@ -6,6 +6,8 @@
 # for terms of use and redistribution.
 #++
 
+require 'stormmq/errors'
+require 'stormmq/rest'
 require 'commandline'
 require 'commandline/optionparser'
 
@@ -41,18 +43,20 @@ module StormMQ
              :opt_not_found   => CommandLine::OptionParser::OPT_NOT_FOUND_BUT_REQUIRED
     end
 
-    def rest_client
+    def rest_client(user)
       begin
-        Rest.new(:user => opt.user)
-      rescue Error::UserNotProvidedError
-        raise "Could not determine the user - either provide it via the --user option or set it via $STORMMQ_USER"
+        Rest.new(:user => user)
       rescue Error::SecretKeyNotProvidedError
-        raise "Could not find the secret key for user '#{self.user}' - please ensure it is present in the secret key file"
+        raise "Could not find the secret key for user '#{user}' - please ensure it is present in the secret key file"
       end
     end
 
     def user
       opt.user || ENV['STORMMQ_USER']
+    end
+
+    def self_test
+      'Self test ouput goes here'
     end
 
   end

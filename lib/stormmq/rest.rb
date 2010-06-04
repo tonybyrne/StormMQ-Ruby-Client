@@ -6,8 +6,11 @@
 # for terms of use and redistribution.
 #++
 
-require "json"
-require "rest_client"
+require 'stormmq/url'
+require 'stormmq/errors'
+require 'stormmq/secret_keys'
+require 'json'
+require 'rest_client'
 
 module StormMQ
 
@@ -34,10 +37,10 @@ module StormMQ
     #
     #
     #  # Client configured for a specific user and that user's secret key looked up in the secret key file.
-    #  client = StormMQ::Rest.new(--user => 'tonybyrne')
+    #  client = StormMQ::Rest.new(:user => 'tonybyrne')
     #
     #  # Explicit secret key, i.e. the secret key file is not consulted or required.
-    #  client = StormMQ::Rest.new(--user => 'tonybyrne', --secret_key => a_secret_key)
+    #  client = StormMQ::Rest.new(:user => 'tonybyrne', :secret_key => a_secret_key)
     def initialize(options={})
       unless @user = options.delete(:user) || ENV['STORMMQ_USER']
         raise Error::UserNotProvidedError,

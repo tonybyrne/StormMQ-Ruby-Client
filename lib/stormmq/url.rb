@@ -12,6 +12,8 @@ require 'hmac'
 require 'hmac-sha2'
 require 'base64'
 
+require 'stormmq/errors'
+
 module StormMQ
 
   SCHEMES_DEFAULT_PORTS = {
