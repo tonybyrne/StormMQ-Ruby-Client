@@ -1,0 +1,211 @@
+#!/usr/bin/env ruby
+# encoding: utf-8
+#--
+# Copyright (c) 2010, Tony Byrne & StormMQ Ltd.
+# All rights reserved.
+#
+# Please refer to the LICENSE file that accompanies this source
+# for terms of use and redistribution.
+#++
+
+$:.unshift File.join(File.expand_path(File.dirname(__FILE__)), "..", "lib")
+
+require 'stormmq/application'
+
+class StormMQ::Application::CreateSystem < StormMQ::Application
+
+  def initialize
+    synopsis  "--help | <userName> | <userName> <systemName> | <userName> <systemName> <companyName>"
+    options :help
+    expected_args [1,4]
+  end
+
+  def main
+    user     = argv[0]
+    system   = argv[1] || user
+    company  = argv[2] || user
+    template = argv[3]
+
+    if template
+      json = read_template(template)
+    else
+      json = default_template(user, company, system)
+    end
+
+    self.rest_client(user).create_system(company, system, json)
+  end
+
+  def read_template(filename)
+    raise "not implemented"
+  end
+
+  def default_template(user, company, system)
+    <<-EOT
+    {
+      "companyName" : "#{user}",
+      "systemName" : "#{system}",
+      "environments" :
+      [
+        {
+          "environmentName" : "development",
+          "clusterName" : "free-1",
+          "permittedStormMQUserNames" :
+          [
+            "#{user}"
+          ]
+        },
+        {
+          "environmentName" : "testing",
+          "clusterName" : "free-1",
+          "permittedStormMQUserNames" :
+          [
+            "#{user}"
+          ]
+        },
+        {
+          "environmentName" : "production",
+          "clusterName" : "free-1",
+          "permittedStormMQUserNames" :
+          [
+            "#{user}"
+          ]
+        }
+      ],
+      "amqpUserPermissions" :
+      {
+        "#{user}" :
+        {
+          "create" : ".*",
+          "read" : ".*",
+          "write" : ".*"
+        }
+      }
+    }
+    EOT
+  end
+
+  def man
+    <<-EOM
+NAME
+
+  #{File.basename(__FILE__)}
+
+PURPOSE
+
+  A system is a logical view of resources in our Messaging Cloud.
+  Typically you'd only need one system, eg 'AccountRocks',
+  'InflationSwapCalculator', 'Jibbit-X', etc. A system has
+  environments.
+
+  A company-system-environment triplet matches an AMQP Virtual Host.
+  E.g., if your company is widgetcorp, your system is accountrock
+  and you want to use an environment of development, your AMQP
+  virtual host name is widgetcorp/accountrock/development.
+
+  If you've just signed up as an ordinary user, then we've already
+  created a system called <userName>for you (see stormmq-list-systems),
+  with an AMQP virtual host called /<userName>/<userName>/development,
+  accessible at amqp.stormmq.com
+
+  All AMQP virtual hosts are virtually hosted on
+  amqp.stormmq.com.
+
+  To find the passwords to log onto them with AMQP, use
+  stormmq-get-amqpuser-password.
+
+USAGE
+
+  #{File.basename(__FILE__)} --help
+  #{File.basename(__FILE__)} <userName>
+  #{File.basename(__FILE__)} <userName> <systemName>
+  #{File.basename(__FILE__)} <userName> <systemName> <companyName>
+  #{File.basename(__FILE__)} <userName> <systemName> <companyName> </path/to/json/template>
+
+  The second form assumes your companyName and systemName is the same
+  as your userName. This is true for ordinary users who've just
+  signed up.
+
+  The third form assumes your companyName is the same as your
+  userName. This is true for ordinary users.
+
+  The fifth form is for advanced use only.
+
+PARAMETERS
+
+  <userName>
+
+    The user name you log into the site with.
+
+  <systemName>
+
+    If you're not sure if you've already created a system, use:
+
+    stormmq-list-systems <userName>
+
+    A systemName can not contain a '/' or ':'
+
+  <companyName>
+
+    For ordinary users, this is the same as your userName. If you're
+    not sure of your companyName, you can retrieve it with:
+
+    stormmq-list-companies <userName>
+
+  </path/to/json/template>
+
+    This is a template used to create a system. Use this to create
+    systems with:
+
+    * Environments using contended or dedicated clusters.
+    * Multiple AMQP users.
+    * Restrictions on whom can access production passwords.
+    * Bespoke per-queue or per-exchange permissions.
+
+    Environment variables will be substituted in the template
+    (specified using ${<NAME>}). If using strings you'll need to
+    make sure they are properly JSON escaped.
+
+  --help, -h
+
+    Displays this help page then quits.
+
+RESULT
+
+  Outputs a simple JSON object if accepted, or nothing if the system
+  already exists with identical settings
+
+REST API
+
+  Equivalent is PUT /companies/<companyName>/<systemName>.
+
+NOTES
+
+  If the system already exists with a different set up, then resources
+  will be created, modified and destroyed as needed. Be careful!
+
+  If using the advanced form, note that your companyName and systemName
+  on the command line must match the values used in the JSON template.
+
+  To find you companyName, use:
+
+    stormmq-list-companies
+
+  To delete your default system, use:
+
+    stormmq-delete-system <userName>
+
+COPYRIGHT
+
+  Copyright (c) 2010, Tony Byrne & StormMQ Ltd.
+  All rights reserved.
+
+SELF TEST
+
+  #{self_test}
+
+    EOM
+  end
+
+end
+
+StormMQ::Application::CreateSystem.run

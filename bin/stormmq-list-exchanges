@@ -13,7 +13,7 @@ $:.unshift File.join(File.expand_path(File.dirname(__FILE__)), "..", "lib")
 require 'stormmq/application'
 require 'json'
 
-class StormMQ::Application::ListAMQPUsers < StormMQ::Application
+class StormMQ::Application::ListExchanges < StormMQ::Application
 
   def initialize
     synopsis "--help | <userName> <systemName> <companyName> <environmentName>"
@@ -22,7 +22,7 @@ class StormMQ::Application::ListAMQPUsers < StormMQ::Application
   end
 
   def main
-    puts JSON.pretty_generate(self.rest_client(@user).amqp_users(@company, @system, @environment))
+    puts JSON.pretty_generate(self.rest_client(@user).exchanges(@company, @system, @environment))
   end
 
   def man
@@ -33,10 +33,8 @@ NAME
 
 PURPOSE
 
-  Lists all the AMQP user names and passwords. For a recently signed
-  up user, we've created you a default system with a default AMQP
-  user name (amqpUserName) the same as your userName, so you don't
-  need this tool yet.
+  Describes the currently known exchanges and their state for an
+  Environment.
 
 USAGE
 
@@ -53,9 +51,6 @@ USAGE
   * development
   * testing
   * production
-
-  For recently signed up users, the amqpUserName is the same as your
-  userName.
 
 PARAMETERS
 
@@ -96,17 +91,11 @@ PARAMETERS
 
 RESULT
 
-  Outputs a simple JSON object of string keys (user names to use with
-  AMQP) to string values (AMQP passwords, to be used as is without
-  decoding but excluding the quotes).
-
-  If using the default system created when you signed up, then the
-  user name to log on to AMQP ('amqpUserName') will be the same as
-  your userName.
+  Outputs a pretty-printed complex JSON list to STDOUT.
 
 REST API
 
-  Equivalent is GET /companies/<companyName>/<systemName>/<environmentName>/users/.
+  Equivalent is GET /companies/<companyName>/<systemName>/<environmentName>/exchanges/.
 
 NOTES
 
@@ -139,4 +128,4 @@ SELF TEST
 
 end
 
-StormMQ::Application::ListAMQPUsers.run
+StormMQ::Application::ListExchanges.run

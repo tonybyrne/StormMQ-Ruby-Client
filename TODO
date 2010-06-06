@@ -1,0 +1,11 @@
+* Implement Windows support / Windows GEM.
+
+* stormmq-create-system: implement template reading from file
+
+* Test proxy support
+
+* SSL certificate support
+
+* Refactor REST methods
+
+* Tests and coverage.

@@ -27,6 +27,8 @@ module StormMQ
 
   class Rest
 
+    RestClient.proxy = ENV['http_proxy'] unless ENV['http_proxy'].nil?
+
     def initialize(options={})
       unless @user = options.delete(:user)
         raise Error::UserNotProvidedError,
@@ -62,6 +64,10 @@ module StormMQ
       signed_get(COMPANIES_PATH, escape(company), '/')
     end
 
+    def create_system(company, system, json)
+      signed_put(json, COMPANIES_PATH, escape(company), escape(system))
+    end
+
     def describe_system(company, system)
       signed_get(COMPANIES_PATH, escape(company), escape(system))
     end
@@ -72,6 +78,18 @@ module StormMQ
 
     def clusters(company)
       signed_get(CLUSTERS_PATH, escape(company))
+    end
+
+    def queues(company, system, environment)
+      signed_get(COMPANIES_PATH, escape(company), escape(system), escape(environment), 'queues/')
+    end
+
+    def bindings(company, system, environment)
+      signed_get(COMPANIES_PATH, escape(company), escape(system), escape(environment), 'bindings/')
+    end
+
+    def exchanges(company, system, environment)
+      signed_get(COMPANIES_PATH, escape(company), escape(system), escape(environment), 'exchanges/')
     end
 
     def apis
@@ -96,6 +114,10 @@ module StormMQ
       delete(build_signed_resource_url(make_normalised_path(*path_args), 'DELETE'))
     end
 
+    def signed_put(payload, *path_args)
+      put(build_signed_resource_url(make_normalised_path(*path_args), 'PUT'), payload)
+    end
+
     def escape(string) # :nodoc:
       StormMQ::URL.escape(string)
     end
@@ -105,7 +127,11 @@ module StormMQ
     end
 
     def delete(signed_url) # :nodoc:
-      JSON.parse(RestClient.delete(signed_url.to_s, {:accept => '*/*'}).to_s)
+      JSON.parse(RestClient.delete(signed_url.to_s).to_s)
+    end
+
+    def put(signed_url, payload) # :nodoc:
+      JSON.parse(RestClient.put(signed_url.to_s, payload, {:accept => '*/*', :content_type => 'application/json'}).to_s)
     end
 
     def build_signed_resource_url(resource_path='/', method='GET') # :nodoc:

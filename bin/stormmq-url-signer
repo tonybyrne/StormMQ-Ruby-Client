@@ -17,8 +17,6 @@ class StormMQ::Application::URLSigner < StormMQ::Application
 
   def initialize
     synopsis  "--help | --user <userName> --method <HttpMethod> --url <URL>"
-    short_description "Signs a URL for use with StormMQ's RESTful API"
-    long_description  ""
     options :help
 
     option :names           => %w(--user -u),

@@ -12,7 +12,7 @@ $:.unshift File.join(File.expand_path(File.dirname(__FILE__)), "..", "lib")
 
 require 'stormmq/application'
 
-class StormMQ::Application::DescribeSystem < StormMQ::Application
+class StormMQ::Application::DeleteSystem < StormMQ::Application
 
   def initialize
     synopsis  "--help | <userName> | <userName> <systemName> | <userName> <systemName> <companyName>"
@@ -114,4 +114,4 @@ SELF TEST
 
 end
 
-StormMQ::Application::DescribeSystem.run
+StormMQ::Application::DeleteSystem.run
