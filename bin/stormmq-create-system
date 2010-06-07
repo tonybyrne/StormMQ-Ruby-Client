@@ -35,8 +35,8 @@ class StormMQ::Application::CreateSystem < StormMQ::Application
     self.rest_client(user).create_system(company, system, json)
   end
 
-  def read_template(filename)
-    raise "not implemented"
+  def read_template(path)
+    IO.read(path)
   end
 
   def default_template(user, company, system)
