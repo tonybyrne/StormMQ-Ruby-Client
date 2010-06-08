@@ -93,7 +93,7 @@ class StormMQ::Application::AMQPEchoTest < StormMQ::Application
       msg = queue.pop[:payload]
 
       if msg == test_message
-        puts "\nSUCESS: received test message '#{msg}'"
+        puts "\nSUCCESS: received test message '#{msg}'"
         retval = 0
       else
         puts "\nFAILURE: expected test message, but got '#{msg}' instead"
