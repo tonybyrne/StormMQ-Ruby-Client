@@ -7,11 +7,15 @@
 # Please refer to the LICENSE file that accompanies this source
 # for terms of use and redistribution.
 #++
+
+$:.unshift File.join(File.expand_path(File.dirname(__FILE__)), "lib")
+
 require "base64"
+require 'stormmq/version'
 
 Gem::Specification.new do |s|
   s.name        = "stormmq-client"
-  s.version     = "0.0.4"
+  s.version     = StormMQ::VERSION
   s.authors     = ["Tony Byrne"]
   s.homepage    = "http://github.com/tonybyrne/StormMQ-Ruby-Client"
   s.summary     = "A client library for StormMQ's Cloud Messaging service"
@@ -22,8 +26,6 @@ Gem::Specification.new do |s|
 
   # files
   s.files = Dir['lib/**/*.rb'] + Dir['bin/*'] + Dir['spec/**/*'] + Dir['[A-Z]*']
-
-  puts s.files.to_yaml
 
   s.executables = Dir["bin/*"].map(&File.method(:basename))
 

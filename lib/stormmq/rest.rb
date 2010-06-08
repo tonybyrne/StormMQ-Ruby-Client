@@ -9,6 +9,7 @@
 require 'stormmq/url'
 require 'stormmq/errors'
 require 'stormmq/secret_keys'
+require 'stormmq/utils'
 require 'json'
 require 'rest_client'
 
@@ -27,7 +28,7 @@ module StormMQ
 
   class Rest
 
-    RestClient.proxy = ENV['http_proxy'] unless ENV['http_proxy'].nil?
+    RestClient.proxy = ENV['http_proxy'] unless ENV['http_proxy'].blank?
 
     def initialize(options={})
       unless @user = options.delete(:user)

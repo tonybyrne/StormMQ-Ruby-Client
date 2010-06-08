@@ -6,78 +6,29 @@
 # for terms of use and redistribution.
 #++
 
-require 'mq'
-require 'pp'
+
+require 'bunny'
+require 'stormmq/version'
 
 module StormMQ
 
-  module AMQPClientImplementation
-
-    VERSION = '0.0.4'
-
-    def process_frame frame
-      if mq = channels[frame.channel]
-        mq.process_frame(frame)
-        return
-      end
-
-      case frame
-      when Frame::Method
-        case method = frame.payload
-        when Protocol::Connection::Start
-          send Protocol::Connection::StartOk.new(
-            {
-              :platform    => 'Ruby/EventMachine',
-              :product     => 'StormMQ AMQP',
-              :information => 'http://github.com/tonybyrne/StormMQ-Ruby-Client/',
-              :version     => VERSION
-            },
-            'AMQPLAIN',
-            {
-              :LOGIN => @settings[:user],
-              :PASSWORD => @settings[:password]
-            },
-            'en_US'
-          )
-
-        when Protocol::Connection::Tune
-          send Protocol::Connection::TuneOk.new(
-            :channel_max => 0,
-            :frame_max   => 131072,
-            :heartbeat   => 0
-          )
-
-          send Protocol::Connection::Open.new(
-            :virtual_host => @settings[:vhost],
-            :capabilities => '',
-            :insist       => @settings[:insist]
-          )
-
-        when Protocol::Connection::OpenOk
-          succeed(self)
-
-        when Protocol::Connection::Close
-          STDERR.puts "#{method.reply_text} in #{Protocol.classes[method.class_id].methods[method.method_id]}"
-
-        when Protocol::Connection::CloseOk
-          @on_disconnect.call if @on_disconnect
-        end
-      end
-    end
-  end
-
   module AMQPClient
 
-    def self.connect(options={})
-      AMQP.client = AMQPClientImplementation
-      AMQP.connect(
-        {
-          :vhost   => self.vhost_from_options(options),
-          :host    => 'amqp.stormmq.com',
-          :port    => 443,
-          :ssl     => true
-        }.merge(options)
-      )
+    def self.instance(options={})
+      Bunny.new(self.add_stormmq_options(options))
+    end
+
+    def self.run(options={}, &block)
+      Bunny.run(self.add_stormmq_options(options), &block)
+    end
+
+    def self.add_stormmq_options(options={})
+      {
+        :vhost   => self.vhost_from_options(options),
+        :host    => 'amqp.stormmq.com',
+        :port    => 443,
+        :ssl     => true
+      }.merge(options)
     end
 
     def self.vhost_from_options(options)

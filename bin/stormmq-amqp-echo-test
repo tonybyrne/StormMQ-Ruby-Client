@@ -65,45 +65,44 @@ class StormMQ::Application::AMQPEchoTest < StormMQ::Application
 
   def main
 
-    EM.run do
+    retval = nil
 
-      puts "creating connection"
-      connection = StormMQ::AMQPClient.connect(
-        :user        => opt.amqpUser,
-        :password    => opt.amqpPassword,
-        :company     => opt.company,
-        :system      => opt.system,
-        :environment => opt.environment,
-        :host        => opt.host,
-        :port        => opt.port,
-        :logging     => opt['--debug']
-      )
+    client_options = {
+      :user        => opt.amqpUser,
+      :pass        => opt.amqpPassword,
+      :company     => opt.company,
+      :system      => opt.system,
+      :environment => opt.environment,
+      :host        => opt.host,
+      :port        => opt.port,
+      :logging     => opt['--debug']
+    }
 
-      puts "opening a channel on the A MQP connection"
-      channel = MQ.new(connection)
+    test_message = 'Hello World!'
 
-      puts "declaring a queue on the channel"
-      queue = MQ::Queue.new(channel, 'test queue')
+    puts "setting up client and connection"
+    StormMQ::AMQPClient.run(client_options) do |client|
 
-      puts "creating a test exchange"
-      exchange = MQ::Exchange.new(channel, :direct, 'test exchange')
+      puts "declaring a queue"
+      queue = client.queue('test1')
 
-      puts "binding the queue the the exchange"
-      queue.bind(exchange)
+      puts "publishing test message '#{test_message}'"
+      queue.publish(test_message)
 
-      puts "publishing test message to the exchange"
-      exchange.publish('hello world')
+      puts "Receiving message from the queue"
+      msg = queue.pop[:payload]
 
-      puts "subsribing to the queue"
-      queue.subscribe do |headers, msg|
-        puts "recevied message from the queue:"
-        pp headers
-        puts msg
-        puts msg == 'hello world' ? 'Succeeded' : 'Failed'
-        connection.close{ EM.stop_event_loop }
+      if msg == test_message
+        puts "\nSUCESS: received test message '#{msg}'"
+        retval = 0
+      else
+        puts "\nFAILURE: expected test message, but got '#{msg}' instead"
+        retval = 1
       end
 
     end
+
+    exit(retval)
 
   end
 
