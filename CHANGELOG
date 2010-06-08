@@ -1,3 +1,7 @@
+0.0.6
+
+  * Update the gemspec to add dependency for Bunny.
+
 0.0.5
 
   * Re-implemented our AMQP client wrapper so we now use the Bunny
@@ -10,4 +14,6 @@
 
     See: http://github.com/celldee/bunny for details.
 
-0.0.4 - Initial Public Release.
+0.0.4
+
+  * Initial Public Release.

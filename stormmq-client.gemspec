@@ -35,7 +35,7 @@ Gem::Specification.new do |s|
   # s.required_ruby_version = ::Gem::Requirement.new("~> 1.8.6")
 
   # dependencies
-  s.add_dependency             "amqp",        ">= 0.6.7"
+  s.add_dependency             "bunny",       ">= 0.6.0"
   s.add_dependency             "rest-client", ">= 1.4.2"
   s.add_dependency             "ruby-hmac",   ">= 0.4.0"
   s.add_dependency             "json",        ">= 1.4.2"
