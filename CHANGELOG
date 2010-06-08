@@ -1,3 +1,13 @@
 0.0.5
 
+  * Re-implemented our AMQP client wrapper so we now use the Bunny
+    client for RabbitMQ. Bunny is a synchronous client built upon
+    QRack.  Our wrapper provides simple convenience methods for
+    obtaining a client instance which is configured with the proper
+    vhost based on the StormMQ companyName, systemName and
+    environmentName parameters.  Our wrapper returns an instance of
+    the Bunny client.
+
+    See: http://github.com/celldee/bunny for details.
+
 0.0.4 - Initial Public Release.
