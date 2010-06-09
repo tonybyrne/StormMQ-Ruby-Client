@@ -124,10 +124,7 @@ NOTES
 
     stormmq-create-system <userName> <systemName>
 
-COPYRIGHT
-
-  Copyright (c) 2010, Tony Byrne & StormMQ Ltd.
-  All rights reserved.
+#{_man_copyright}
 
 SELF TEST
 

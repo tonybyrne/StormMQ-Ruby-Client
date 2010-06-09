@@ -32,5 +32,15 @@ module StormMQ
       'Self test ouput goes here'
     end
 
+    def _man_copyright
+      <<-EOS
+COPYRIGHT
+
+  Copyright (c) 2010, Tony Byrne & StormMQ Ltd.
+  All rights reserved.
+      EOS
+    end
+
+
   end
 end

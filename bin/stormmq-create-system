@@ -194,10 +194,7 @@ NOTES
 
     stormmq-delete-system <userName>
 
-COPYRIGHT
-
-  Copyright (c) 2010, Tony Byrne & StormMQ Ltd.
-  All rights reserved.
+#{_man_copyright}
 
 SELF TEST
 

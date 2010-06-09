@@ -190,10 +190,7 @@ NOTES
 
   For a default system, you'll just need your userName.
 
-COPYRIGHT
-
-  Copyright (c) 2010, Tony Byrne & StormMQ Ltd.
-  All rights reserved.
+#{_man_copyright}
 
     EOM
   end

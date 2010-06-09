@@ -72,10 +72,7 @@ NOTES
   Security prevents you from obtaining information about which other
   users belong to which companies.
 
-COPYRIGHT
-
-  Copyright (c) 2010, Tony Byrne & StormMQ Ltd.
-  All rights reserved.
+#{_man_copyright}
 
 SELF TEST
 

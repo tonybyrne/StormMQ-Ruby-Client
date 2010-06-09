@@ -68,10 +68,7 @@ NOTES
   Pretty prints JSON, so not suitable for use with XHTML etc.,
   response documents.
 
-COPYRIGHT
-
-  Copyright (c) 2010, Tony Byrne & StormMQ Ltd.
-  All rights reserved.
+#{_man_copyright}
 
 SELF TEST
 

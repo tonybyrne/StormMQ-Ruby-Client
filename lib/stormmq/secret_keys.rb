@@ -11,20 +11,23 @@ require 'json'
 require 'base64'
 require 'stormmq/base64_extensions'
 require 'stormmq/errors'
+require 'stormmq/utils'
 
 module StormMQ
 
-  SECRET_KEYS_SEARCH_PATH = ['~/.stormmq','/etc']
+  SECRET_KEYS_SEARCH_PATH = [
+    File.join(ENV['HOME'], '.stormmq'),
+    File.join('/', 'etc', 'stormmq')
+  ]
+
   SECRET_KEYS_FILENAME    = 'secret-keys.json'
 
   class SecretKeys
     include Singleton
-    attr_writer :key_cache
 
-    # Returns the base64 encoded secret key for the given user name from the secret keys file.
+    # Returns the secret key for the given user name from the secret keys file.
     def key_for(user)
-      raise Error::UserNotProvidedError, "user cannot be nil."   if user.nil?
-      raise Error::UserNotProvidedError, "user cannot be empty." if user.empty?
+      raise Error::UserNotProvidedError, "user cannot be blank." if user.blank?
       keys[user] || (raise Error::SecretKeyNotFoundError, "a secret key for user '#{user}' could not be found in the secret key file.", caller)
     end
 
@@ -43,7 +46,7 @@ module StormMQ
     # Load the keys from the secret keys file <tt>keyfile</tt>.  Walks the locations specified in
     # <tt>search_path</tt> in order of preference.
     def load_secret_keys(search_path=SECRET_KEYS_SEARCH_PATH, keyfile=SECRET_KEYS_FILENAME)
-      full_paths = search_path.map{|p| File.expand_path("#{p}/#{keyfile}")}
+      full_paths = search_path.map{|p| File.expand_path(File.join(p,keyfile))}
       full_paths.each do |full_path|
         begin
           return SecretKeys.secret_keys_hash_from_json(IO.read(full_path))
