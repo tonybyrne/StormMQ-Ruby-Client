@@ -6,7 +6,8 @@
 # for terms of use and redistribution.
 #++
 
-require File.dirname(__FILE__) + '/../../lib/stormmq/url'
+require File.join(File.dirname(__FILE__), '..', 'spec_helper')
+require 'stormmq/url'
 
 describe StormMQ::URL do
 

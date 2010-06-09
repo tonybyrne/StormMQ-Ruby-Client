@@ -6,9 +6,10 @@
 # for terms of use and redistribution.
 #++
 
+require File.join(File.dirname(__FILE__), '..', 'spec_helper')
 require 'base64'
-require File.dirname(__FILE__) + '/../../lib/stormmq/secret_keys'
-require File.dirname(__FILE__) + '/../../lib/stormmq/base64_extensions'
+require 'stormmq/secret_keys'
+require 'stormmq/base64_extensions'
 
 describe StormMQ::SecretKeys do
 
