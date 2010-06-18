@@ -11,7 +11,7 @@ require 'cgi'
 require 'hmac'
 require 'hmac-sha2'
 require 'base64'
-
+require 'stormmq/base64_extensions'
 require 'stormmq/errors'
 
 module StormMQ
@@ -80,7 +80,7 @@ module StormMQ
 
     def to_h
       components = URI.split(@url.to_s)
-      {
+      component_hash = {
         :scheme   => components[0],
         :userinfo => components[1],
         :host     => components[2],
@@ -91,6 +91,7 @@ module StormMQ
         :query    => components[7],
         :fragment => components[8]
       }.reject {|k,v| v.nil?}
+      component_hash
     end
 
     def self.escape(string)

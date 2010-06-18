@@ -36,6 +36,27 @@ module StormMQ
       keys.keys
     end
 
+    # Load the keys from the secret keys file <tt>keyfile</tt>.  Walks the locations specified in
+    # <tt>search_path</tt> in order of preference.
+    def load_secret_keys(search_path=SECRET_KEYS_SEARCH_PATH, keyfile=SECRET_KEYS_FILENAME)
+      full_paths = search_path.map{|p| File.expand_path(File.join(p,keyfile))}
+      full_paths.each do |full_path|
+        begin
+          return @secret_keys_cache = SecretKeys.secret_keys_hash_from_json(IO.read(full_path))
+        rescue
+          # A dummy statement so that this branch is picked up by rcov
+          dummy = true
+        end
+      end
+      raise Error::LoadSecretKeysError,
+          "Could not read the secret keys file from any of [#{full_paths.join ', '}]. Please ensure that a valid keyfile exists in one of these locations and that it is readable.",
+          caller
+    end
+
+    def forget_keys
+      @secret_keys_cache = nil
+    end
+
     private
 
     # Return a hash of keys stored in the secret keys file.
@@ -43,20 +64,6 @@ module StormMQ
       @secret_keys_cache ||= load_secret_keys
     end
 
-    # Load the keys from the secret keys file <tt>keyfile</tt>.  Walks the locations specified in
-    # <tt>search_path</tt> in order of preference.
-    def load_secret_keys(search_path=SECRET_KEYS_SEARCH_PATH, keyfile=SECRET_KEYS_FILENAME)
-      full_paths = search_path.map{|p| File.expand_path(File.join(p,keyfile))}
-      full_paths.each do |full_path|
-        begin
-          return SecretKeys.secret_keys_hash_from_json(IO.read(full_path))
-        rescue
-        end
-      end
-      raise Error::LoadSecretKeysError,
-          "Could not read the secret keys file from any of [#{full_paths.join ', '}]. Please ensure that a valid keyfile exists in one of these locations and that it is readable.",
-          caller
-    end
 
     def self.key_for(*args)
       self.instance.key_for(*args)

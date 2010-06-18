@@ -127,4 +127,72 @@ describe StormMQ::URL do
 
   end
 
+  describe "valid?" do
+    
+    it "a valid URL" do
+      StormMQ::URL.new("http://www.byrnehq.com").valid?.should be_true
+    end
+
+    it "an invalid URL" do
+      lambda { StormMQ::URL.new("random://www") }.should raise_error(StormMQ::Error::InvalidURLError)
+    end
+    
+    it "an invalid URI as detected by URI.parse" do
+      URI.should_receive(:parse).and_raise URI::InvalidURIError
+      lambda { StormMQ::URL.new({:host => 'www.byrnehq.com'}) }.should raise_error(StormMQ::Error::InvalidURLError)
+    end
+    
+  end
+
+  describe "to_h" do
+    
+    before(:each) do
+      @hash = StormMQ::URL.new('http://www.stormmq.com:81/path?query=1').to_h
+    end
+    
+    it "should extract the scheme" do
+      @hash[:scheme].should == 'http'
+    end
+
+    it "should extract the host" do
+      @hash[:host].should == 'www.stormmq.com'
+    end
+
+    it "should extract the port" do
+      @hash[:port].should == '81'
+    end
+
+    it "should extract the path" do
+      @hash[:path].should == '/path'
+    end
+
+    it "should extract the query" do
+      @hash[:query].should == 'query=1'
+    end
+
+    it "should not contain a fragment" do
+      @hash[:fragment].should be_nil
+    end
+
+    it "should not contain an opaque" do
+      @hash[:opaque].should be_nil
+    end
+
+    it "should not contain a registry" do
+      @hash[:registry].should be_nil
+    end
+    
+  end
+
+  describe "canonicalise and sign" do
+    
+    it "should canonicalise and sign a URL (in one step)" do
+      base64key = "d60bfe079c88f2c78310131d9bb419214ec3badb0bdfccb20a1c568f380426c5"
+      key = Base64::decode64(base64key)
+      StormMQ::URL.new('http://api.stormmq.com/').canonicalise_and_sign('test', base64key).to_s.should  ==
+        'http://api.stormmq.com:80/?signature=qQC5BNDK5rMOxLC0G2hkOoW5Z7P-c4aO2pok5r0V0Ac%3D&user=test&version=0'      
+    end
+    
+  end
+
 end

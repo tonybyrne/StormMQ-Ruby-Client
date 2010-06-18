@@ -1,3 +1,11 @@
+0.0.7
+
+  * Added additional Rspecs to bring test coverage of the API code
+    up to 100%.
+
+  * It's now possible to load the secret keys from a custom location
+    via the API
+
 0.0.6
 
   * Update the gemspec to add dependency for Bunny.
