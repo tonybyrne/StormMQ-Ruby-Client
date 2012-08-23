@@ -29,7 +29,7 @@ module StormMQ
     end
 
     def self_test
-      'Self test ouput goes here'
+      'Self test output goes here'
     end
 
     def _man_copyright
