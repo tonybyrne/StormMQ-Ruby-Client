@@ -1,0 +1,12 @@
+source 'http://rubygems.org'
+source 'http://gems.github.com'
+
+gem 'rake'
+gem 'rspec', '~>1.3.2'
+gem 'rcov'
+gem 'bunny'
+gem 'json'
+gem 'rest-client', '>= 1.4.2'
+gem 'ruby-hmac',   '>= 0.4.0'
+gem 'commandline', '>= 0.7.10'
+gem 'rdoc',        '>= 2.5.8'
